@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>当下</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@200;300;400&family=Cormorant+Garamond:wght@200;300&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+:root{--cream:#f5f2ec;--ink:#211f1b;--red:#aa2318;}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--cream);}
+body{
+  display:flex;flex-direction:column;align-items:center;
+  font-family:'Noto Serif SC',serif;
+  overflow-x:hidden;
+}
+
+header{
+  flex-shrink:0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding-top:20px;
+  gap:0;
+  opacity:0;
+  animation:fadeUp 1.6s cubic-bezier(0.22,1,0.36,1) 0.1s forwards;
+}
+
+.title{
+  font-weight:200;
+  font-size:36px;
+  letter-spacing:18px;
+  padding-left:18px;
+  color:var(--ink);
+  line-height:1;
+  margin-bottom:8px;
+}
+
+/* Decorative line with red dot center */
+.title-rule{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  margin-bottom:7px;
+}
+.title-rule::before,.title-rule::after{
+  content:'';
+  display:block;
+  width:30px; height:0.5px;
+  background:rgba(170,35,24,0.35);
+}
+.title-rule-dot{
+  width:3px; height:3px;
+  border-radius:50%;
+  background:var(--red);
+  opacity:0.6;
+}
+
+/* English: Cormorant italic, elegant spacing */
+.sub{
+  font-family:'Cormorant Garamond',serif;
+  font-weight:300;
+  font-style:italic;
+  font-size:11.5px;
+  letter-spacing:3.5px;
+  color:rgba(33,31,27,0.45);
+  line-height:1;
+}
+.sub-en{ display:none; }
+.rule{ display:none; }
+
+/* Stage holds canvas + cloud divs */
+.stage{
+  flex-shrink:0;position:relative;
+  width:300px;height:300px;
+  margin-top:4px;cursor:pointer;opacity:0;
+  animation:fadeUp 2s cubic-bezier(0.22,1,0.36,1) 0.4s forwards;
+}
+#c{position:absolute;top:0;left:0;display:block;z-index:1;}
+
+/* Cloud layer — sits above canvas, covers whole stage */
+#clouds{
+  position:absolute;inset:0;z-index:2;
+  pointer-events:none;
+  transition:opacity 1.8s ease;
+}
+#clouds.gone{opacity:0;}
+
+/* Each cloud is a div with box-shadow puffs — pure CSS, no canvas weirdness */
+.cloud{
+  position:absolute;
+  /* Each cloud is invisible itself; its puffs come from box-shadow */
+  width:0;height:0;
+}
+.cloud::before,.cloud::after{
+  content:'';
+  position:absolute;
+  border-radius:50%;
+  background:white;
+}
+
+/* Cloud A — left side of equator */
+.ca{top:148px;left:18px;}
+.ca::before{
+  width:90px;height:52px;
+  top:-26px;left:-20px;
+  box-shadow:
+    0 0 0 0 white,
+    28px -18px 0 4px white,
+    56px -10px 0 -2px white,
+    14px -36px 0 0px white,
+    42px -32px 0 2px white,
+    -10px -12px 0 -4px white;
+  filter:blur(5px);
+}
+.ca::after{
+  width:110px;height:30px;
+  top:8px;left:-25px;
+  filter:blur(8px);
+  background:rgba(255,255,255,0.7);
+}
+
+/* Cloud B — right side, slightly higher */
+.cb{top:122px;left:192px;}
+.cb::before{
+  width:80px;height:46px;
+  top:-23px;left:-15px;
+  box-shadow:
+    0 0 0 0 white,
+    24px -16px 0 3px white,
+    48px -8px 0 -2px white,
+    12px -30px 0 0 white,
+    38px -28px 0 2px white;
+  filter:blur(5px);
+}
+.cb::after{
+  width:95px;height:26px;
+  top:6px;left:-20px;
+  filter:blur(7px);
+  background:rgba(255,255,255,0.7);
+}
+
+/* Cloud C — bottom equator band */
+.cc{top:198px;left:80px;}
+.cc::before{
+  width:100px;height:50px;
+  top:-25px;left:-18px;
+  box-shadow:
+    0 0 0 0 white,
+    30px -20px 0 4px white,
+    60px -10px 0 -2px white,
+    15px -38px 0 1px white,
+    46px -34px 0 3px white,
+    -12px -14px 0 -3px white;
+  filter:blur(5px);
+}
+.cc::after{
+  width:118px;height:32px;
+  top:10px;left:-22px;
+  filter:blur(8px);
+  background:rgba(255,255,255,0.7);
+}
+
+/* Drift animation */
+.ca{animation:driftA 9s ease-in-out infinite alternate;}
+.cb{animation:driftB 11s ease-in-out infinite alternate;}
+.cc{animation:driftC 10s ease-in-out infinite alternate;}
+@keyframes driftA{from{transform:translate(0,0);}to{transform:translate(4px,3px);}}
+@keyframes driftB{from{transform:translate(0,0);}to{transform:translate(-3px,4px);}}
+@keyframes driftC{from{transform:translate(0,0);}to{transform:translate(5px,-3px);}}
+
+#cta{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:10;display:flex;flex-direction:column;align-items:center;pointer-events:none;transition:opacity 0.8s ease;}
+#cta.hidden{opacity:0;}
+.cta-click{font-family:'Noto Serif SC',serif;font-weight:400;font-size:22px;letter-spacing:8px;padding-left:8px;color:var(--red);line-height:1.2;text-shadow:0 0 8px #fff,0 0 20px #fff,0 0 35px rgba(255,255,255,0.9);animation:breathe 3.4s ease-in-out infinite;}
+.cta-enter{font-family:'Noto Serif SC',serif;font-weight:400;font-size:18px;letter-spacing:7px;padding-left:7px;color:var(--red);line-height:1.3;text-shadow:0 0 8px #fff,0 0 20px #fff,0 0 35px rgba(255,255,255,0.9);animation:breathe 3.4s ease-in-out infinite;}
+@keyframes breathe{0%,100%{opacity:.5;}50%{opacity:1;}}
+
+#tagline{
+  flex-shrink:0;
+  width:calc(100% - 60px);
+  max-width:300px;
+  text-align:center;
+  margin-top:18px;
+  opacity:0;
+  transition:opacity 0.6s ease;
+}
+#tagline.visible{opacity:1;}
+#tagline.gone{
+  opacity:0;
+  pointer-events:none;
+  height:0;overflow:hidden;margin:0;
+  transition:opacity 0.4s ease, height 0s ease 0.4s, margin 0s ease 0.4s;
+}
+.tagline-main{
+  font-family:'Noto Serif SC',serif;
+  font-weight:300;
+  font-size:16px;
+  letter-spacing:2px;
+  color:rgba(33,31,27,0.78);
+  line-height:1.6;
+  margin-bottom:4px;
+}
+.tagline-gap{
+  margin-top:10px;
+}
+.tagline-em{
+  font-size:20px;
+  letter-spacing:6px;
+  font-weight:200;
+  margin-top:2px;
+}
+.tagline-main em{
+  font-style:normal;
+  color:var(--red);
+  font-weight:300;
+}
+.tagline-rule{
+  display:flex;align-items:center;gap:8px;
+  justify-content:center;
+  margin:8px 0 6px;
+}
+.tagline-rule::before,.tagline-rule::after{
+  content:'';display:block;
+  width:24px;height:0.5px;
+  background:rgba(33,31,27,0.2);
+}
+.tagline-rule-dot{
+  width:3px;height:3px;border-radius:50%;
+  background:rgba(170,35,24,0.5);
+}
+
+.dot{
+  position:absolute;width:7px;height:7px;
+  border-radius:50%;background:var(--red);
+  transform:translate(-50%,-50%);
+  opacity:0;z-index:11;pointer-events:none;
+  transition:opacity .5s ease;
+}
+.dot.on{opacity:1;}
+.dot.on::before,
+.dot.on::after{
+  content:'';
+  position:absolute;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  border-radius:50%;
+  border:1px solid rgba(170,35,24,0.6);
+  width:7px;height:7px;
+  animation:ripple 2.4s ease-out infinite;
+}
+.dot.on::after{
+  border-color:rgba(170,35,24,0.3);
+  animation:ripple 2.4s ease-out 0.8s infinite;
+}
+@keyframes ripple{
+  0%  {width:7px;height:7px;opacity:0.8;}
+  100%{width:36px;height:36px;opacity:0;}
+}
+
+#panel{flex-shrink:0;width:calc(100% - 44px);max-width:320px;margin-top:0px;opacity:0;transform:translateY(10px);transition:opacity 1s cubic-bezier(0.22,1,0.36,1) .3s,transform 1s cubic-bezier(0.22,1,0.36,1) .3s;}
+#panel.show{opacity:1;transform:translateY(0);}
+.p-line{width:18px;height:.5px;background:var(--red);opacity:.45;margin-bottom:6px;}
+.p-syncing{
+  font-family:'Noto Serif SC',serif;font-weight:300;
+  font-size:13px;letter-spacing:3px;color:var(--red);
+  margin-bottom:8px;
+  animation:syncPulse 1.6s ease-in-out infinite;
+}
+@keyframes syncPulse{0%,100%{opacity:0.2;}50%{opacity:1;}}
+.p-loc{font-family:'Cormorant Garamond',serif;font-weight:200;font-size:9px;letter-spacing:3.5px;color:var(--red);text-transform:uppercase;margin-bottom:4px;}
+.p-title{font-weight:200;font-size:13.5px;letter-spacing:1.5px;color:var(--ink);line-height:1.5;margin-bottom:10px;}
+.p-meta{display:flex;justify-content:space-between;align-items:baseline;padding-bottom:4px;border-bottom:.5px solid rgba(33,31,27,.1);margin-bottom:4px;}
+.p-time{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:22px;color:var(--ink);font-variant-numeric:tabular-nums;}
+.p-coords{font-family:'Cormorant Garamond',serif;font-weight:200;font-size:9px;letter-spacing:1px;color:rgba(33,31,27,.38);text-align:right;line-height:1.9;}
+.p-text{font-weight:400;font-size:12.5px;line-height:1.85;letter-spacing:.2px;color:rgba(33,31,27,.90);text-align:justify;}.p-text div{margin-bottom:0.3em;}
+.p-text em{font-style:normal;color:var(--ink);font-weight:500;}
+
+.save-btn{
+  display:flex;align-items:center;gap:10px;
+  margin-top:14px;cursor:pointer;
+  border:none;background:none;padding:0;
+  opacity:0.8;
+}
+.save-btn:active{opacity:0.5;}
+.save-btn-icon{
+  width:28px;height:28px;
+  border:.5px solid var(--red);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.save-btn-icon::after{
+  content:'';width:7px;height:7px;
+  border-radius:50%;background:var(--red);
+}
+.save-btn-text{
+  font-family:'Noto Serif SC',serif;font-weight:300;
+  font-size:13px;letter-spacing:3px;color:var(--ink);
+}
+
+/* ── DRAWER MODAL ── */
+#drawer{
+  position:fixed;
+  top:0;right:-100%;
+  width:88%;max-width:340px;
+  height:100%;
+  background:var(--cream);
+  box-shadow:-8px 0 40px rgba(33,31,27,0.12);
+  z-index:200;
+  display:flex;flex-direction:column;
+  transition:right 0.4s cubic-bezier(0.22,1,0.36,1);
+  padding:52px 28px 60px;
+  box-sizing:border-box;
+  overflow:hidden;
+}
+#drawer.open{right:0;}
+
+#drawer-overlay{
+  position:fixed;inset:0;
+  background:rgba(33,31,27,0);
+  z-index:199;
+  pointer-events:none;
+  transition:background 0.4s ease;
+}
+#drawer-overlay.open{
+  background:rgba(33,31,27,0.25);
+  pointer-events:all;
+}
+
+.drawer-close{
+  position:absolute;top:20px;right:24px;
+  background:none;border:none;cursor:pointer;
+  font-family:'Noto Serif SC',serif;
+  font-size:13px;letter-spacing:2px;
+  color:rgba(33,31,27,0.55);
+}
+
+.drawer-title{
+  font-family:'Noto Serif SC',serif;
+  font-weight:400;font-size:17px;
+  letter-spacing:4px;color:var(--ink);
+  margin-bottom:4px;
+}
+.drawer-sub{
+  font-family:'Cormorant Garamond',serif;
+  font-style:italic;font-size:14px;
+  letter-spacing:2px;color:rgba(33,31,27,0.55);
+  margin-bottom:20px;
+}
+.drawer-meta{
+  font-family:'Cormorant Garamond',serif;
+  font-size:14px;letter-spacing:1.5px;
+  color:rgba(33,31,27,0.6);
+  margin-bottom:16px;
+  line-height:1.8;
+}
+.drawer-divider{
+  width:100%;height:.5px;
+  background:rgba(33,31,27,0.1);
+  margin-bottom:16px;
+}
+#drawerInput{
+  flex:1;width:100%;
+  border:none;outline:none;
+  background:transparent;resize:none;
+  font-family:'Noto Serif SC',serif;
+  font-weight:300;font-size:16px;
+  line-height:2;letter-spacing:.3px;
+  color:rgba(33,31,27,0.88);
+  -webkit-text-size-adjust:100%;
+}
+#drawerInput::placeholder{
+  color:rgba(33,31,27,0.22);
+  font-style:normal;
+}
+.drawer-rename{
+  display:flex;align-items:center;justify-content:space-between;
+  background:none;border:none;
+  border-bottom:0.5px solid rgba(33,31,27,0.08);
+  padding:6px 0 10px;
+  margin-bottom:12px;
+  width:100%;cursor:pointer;
+}
+#drawerNameDisplay{
+  font-family:'Noto Serif SC',serif;
+  font-weight:400;font-size:15px;
+  letter-spacing:3px;color:rgba(33,31,27,0.82);
+}
+.drawer-rename-hint{
+  font-family:'Cormorant Garamond',serif;
+  font-style:italic;font-size:13px;
+  letter-spacing:1.5px;color:rgba(33,31,27,0.45);
+}
+.drawer-save{
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  margin-top:auto;padding-top:20px;cursor:pointer;
+  border:none;background:none;
+  flex-shrink:0;
+}
+.drawer-save-line{width:20px;height:.5px;background:var(--red);}
+.drawer-save-text{
+  font-family:'Noto Serif SC',serif;
+  font-weight:400;font-size:16px;
+  letter-spacing:5px;color:var(--red);
+}
+
+.save-toast{display:none;}
+
+/* ── ONBOARDING ── */
+#onboarding{
+  position:fixed;inset:0;
+  background:var(--cream);
+  z-index:400;
+  display:none;
+  flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:48px 40px;
+  box-sizing:border-box;
+  opacity:0;
+  transition:opacity 0.8s ease;
+}
+#onboarding.show{opacity:1;}
+#onboarding.hide{
+  opacity:0;
+  pointer-events:none;
+  transition:opacity 0.6s ease;
+}
+.ob-question{
+  font-family:'Noto Serif SC',serif;
+  font-weight:200;font-size:28px;
+  letter-spacing:8px;
+  color:rgba(33,31,27,0.82);
+  margin-bottom:8px;
+  text-align:center;
+}
+.ob-sub{
+  font-family:'Cormorant Garamond',serif;
+  font-style:italic;font-size:13px;
+  letter-spacing:3px;
+  color:rgba(33,31,27,0.3);
+  margin-bottom:40px;
+  text-align:center;
+}
+.ob-rule{
+  display:flex;align-items:center;gap:8px;
+  margin-bottom:36px;
+}
+.ob-rule::before,.ob-rule::after{
+  content:'';display:block;
+  width:28px;height:0.5px;
+  background:rgba(170,35,24,0.3);
+}
+.ob-rule-dot{
+  width:3px;height:3px;border-radius:50%;
+  background:var(--red);opacity:0.6;
+}
+#obInput{
+  background:none;border:none;
+  border-bottom:0.5px solid rgba(33,31,27,0.25);
+  outline:none;
+  font-family:'Noto Serif SC',serif;
+  font-weight:300;font-size:22px;
+  letter-spacing:4px;
+  color:rgba(33,31,27,0.88);
+  text-align:center;
+  width:100%;max-width:260px;
+  padding:8px 0;
+  margin-bottom:40px;
+  -webkit-text-size-adjust:100%;
+}
+#obInput::placeholder{
+  color:rgba(33,31,27,0.18);
+  font-size:16px;
+  letter-spacing:3px;
+}
+.ob-confirm{
+  display:flex;align-items:center;gap:10px;
+  background:none;border:none;cursor:pointer;
+  opacity:0.5;
+  transition:opacity 0.3s;
+}
+.ob-confirm.active{opacity:1;}
+.ob-confirm-line{width:20px;height:0.5px;background:var(--red);}
+.ob-confirm-text{
+  font-family:'Noto Serif SC',serif;
+  font-weight:300;font-size:13px;
+  letter-spacing:4px;color:var(--red);
+}
+
+/* ── STAMP OVERLAY ── */
+#stampOverlay{
+  position:fixed;inset:0;
+  z-index:300;
+  display:flex;align-items:center;justify-content:flex-end;
+  pointer-events:none;
+  padding-right:24px;
+}
+#stampOverlay.show{pointer-events:all;}
+#stampBox{
+  position:relative;
+  padding:12px 18px;
+  display:inline-flex;flex-direction:column;align-items:center;
+  gap:5px;
+  opacity:0;
+  transform:translateY(-30px) rotate(-4deg);
+  border:2.5px solid var(--red);
+  box-shadow:inset 0 0 0 2px rgba(170,35,24,0.3);
+  min-width:160px;
+}
+#stampOverlay.show #stampBox{
+  animation:stampDrop 0.5s cubic-bezier(0.22,1,0.36,1) 0.1s forwards;
+}
+@keyframes stampDrop{
+  0%  {opacity:0;transform:translateY(-40px) rotate(-4deg);}
+  55% {opacity:0.9;transform:translateY(4px) rotate(0.8deg);}
+  75% {transform:translateY(-2px) rotate(-0.3deg);}
+  100%{opacity:0.88;transform:translateY(0) rotate(0deg);}
+}
+.stamp-title{
+  font-family:'Noto Serif SC',serif;
+  font-weight:400;font-size:22px;
+  letter-spacing:8px;padding-left:8px;
+  color:var(--red);
+}
+.stamp-rule{
+  width:100%;height:0.5px;
+  background:rgba(170,35,24,0.35);
+}
+.stamp-no{
+  font-family:'Cormorant Garamond',serif;
+  font-weight:400;font-size:13px;
+  letter-spacing:2px;
+  color:var(--red);
+  opacity:1;
+}
+.stamp-name{
+  font-family:'Noto Serif SC',serif;
+  font-weight:300;font-size:11px;
+  letter-spacing:3px;
+  color:rgba(170,35,24,0.9);
+}
+.stamp-sub{
+  font-family:'Cormorant Garamond',serif;
+  font-style:italic;font-size:11px;
+  letter-spacing:2.5px;
+  color:rgba(170,35,24,0.75);
+}
+.p-end{text-align:center;margin-top:8px;opacity:.15;font-family:'Cormorant Garamond',serif;font-size:16px;letter-spacing:8px;}
+
+/* Line reveal — opacity+translate only, works on iOS Safari */
+.type-line{
+  display:block;
+  opacity:0;
+  transform:translateY(8px);
+  transition:none;
+}
+.type-line.reveal{
+  animation:lineReveal 0.7s cubic-bezier(0.22,1,0.36,1) forwards;
+}
+@keyframes lineReveal{
+  from{opacity:0;transform:translateY(8px);}
+  to{opacity:1;transform:translateY(0);}
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+</style>
+</head>
+<body>
+<header>
+  <h1 class="title">当下</h1>
+  <div class="title-rule"><div class="title-rule-dot"></div></div>
+  <p class="sub">at this moment</p>
+</header>
+
+<div class="stage" id="stage">
+  <canvas id="c" width="300" height="300"></canvas>
+  <!-- Clouds as CSS divs, completely independent from canvas clipping -->
+  <div id="clouds">
+    <div class="cloud ca"></div>
+    <div class="cloud cb"></div>
+    <div class="cloud cc"></div>
+  </div>
+  <div class="dot" id="dot"></div>
+  <div id="cta">
+    <div class="cta-click">点 击</div>
+    <div class="cta-enter">进入此间</div>
+  </div>
+</div>
+
+<div id="tagline">
+  <div class="tagline-rule"><div class="tagline-rule-dot"></div></div>
+  <p class="tagline-main">在时间的荒野里，</p>
+  <p class="tagline-main">没有一秒是重复的。</p>
+  <p class="tagline-main tagline-gap">我们称之为，</p>
+  <p class="tagline-main tagline-em"><em>当下</em></p>
+</div>
+
+<div id="panel">
+  <div class="p-line"></div>
+  <p class="p-syncing" id="syncMsg" style="display:none;">正在同步星历…</p>
+  <p class="type-line" style="font-family:'Noto Serif SC',serif;font-weight:300;font-size:14px;letter-spacing:2px;color:var(--ink);margin-bottom:2px;" id="p-loc-zh"></p>
+  <p class="type-line" style="font-family:'Cormorant Garamond',serif;font-weight:400;font-size:13px;letter-spacing:2px;color:rgba(33,31,27,0.85);margin-bottom:3px;" id="p-loc-en"></p>
+  <p class="type-line" style="font-family:'Cormorant Garamond',serif;font-weight:400;font-size:14px;letter-spacing:2px;color:var(--red);margin-bottom:6px;" id="coords-top"></p>
+
+  <div class="p-meta" id="pmeta" style="opacity:0;transition:opacity 0.6s ease;">
+    <span class="p-time" id="clock">--:--:--</span>
+  </div>
+
+  <button class="save-btn" id="saveBtn" onclick="saveThisMoment()">
+    <div class="save-btn-icon"></div>
+    <span class="save-btn-text">记 录 此 刻</span>
+  </button>
+
+  <div style="width:100%;height:.5px;background:rgba(33,31,27,0.08);margin:16px 0 12px;"></div>
+
+  <div class="p-text" id="ptext">
+    <div class="type-line" id="tl1">在朝阳大悦城玻璃幕墙以北数公里，曾是平房乡的农田。<em>那些田埂</em>被埋在混凝土之下。</div>
+    <div class="type-line" id="tl2">春天麦苗随风俯仰；秋收后秸秆烧尽，土地变成焦褐，烟气漫漶与冬日连成灰白。</div>
+    <div class="type-line" id="tl3"><em>没有人记得边界在哪里。</em>城市扩张从不宣布，只是悄悄将某个早晨变成另一种早晨。</div>
+    <div class="type-line" id="tl4">而当下——冷气从旋转门溢出混入九月热风，<em>这一刻终将成为被覆盖的土地。</em></div>
+  </div>
+</div>
+
+<div id="drawer-overlay" onclick="closeDrawer()"></div>
+<div id="drawer">
+  <button class="drawer-close" onclick="closeDrawer()">关 闭</button>
+  <p class="drawer-title">记录此刻</p>
+  <p class="drawer-sub">this moment, preserved</p>
+  <div class="drawer-meta" id="drawerMeta"></div>
+  <button class="drawer-rename" id="drawerRename" onclick="renameSelf()">
+    <span id="drawerNameDisplay"></span>
+    <span class="drawer-rename-hint">修改署名</span>
+  </button>
+  <div class="drawer-divider"></div>
+  <textarea id="drawerInput" placeholder="此刻，你想说什么……" maxlength="500"></textarea>
+  <button class="drawer-save" onclick="drawerSave()">
+    <div class="drawer-save-line"></div>
+    <span class="drawer-save-text">封存此刻</span>
+  </button>
+</div>
+
+<div class="save-toast" id="saveToast"></div>
+<div id="onboarding">
+  <p class="ob-question">你是谁</p>
+  <p class="ob-sub">who are you</p>
+  <div class="ob-rule"><div class="ob-rule-dot"></div></div>
+  <input id="obInput" type="text" placeholder="输入你的名字"  autocomplete="off">
+  <button class="ob-confirm" id="obConfirm" onclick="confirmName()">
+    <div class="ob-confirm-line"></div>
+    <span class="ob-confirm-text">进入当下</span>
+  </button>
+</div>
+
+<div id="stampOverlay">
+  <div id="stampBox">
+    <div class="stamp-title">当 下</div>
+    <div class="stamp-rule"></div>
+    <div class="stamp-no" id="stampNo">NO. 20260225-0812</div>
+    <div class="stamp-name" id="stampName"></div>
+    <div class="stamp-sub">AT THIS MOMENT</div>
+  </div>
+</div>
+
+<script>
+const canvas=document.getElementById('c');
+const ctx=canvas.getContext('2d');
+const W=300,CX=150,CY=150,GR=110;
+let gOff=0, dotActive=false, userLat=39.9, userLon=116.4;
+
+const CONTINENTS=[
+  {c:'#d4b896',pts:[[-168,72],[-140,70],[-120,74],[-85,73],[-65,68],[-55,63],[-52,47],[-65,44],[-70,42],[-75,35],[-80,25],[-90,15],[-80,8],[-95,22],[-112,28],[-120,34],[-125,38],[-130,54],[-140,60],[-150,62],[-160,60],[-168,66]]},
+  {c:'#d4b896',pts:[[-80,12],[-63,8],[-50,4],[-35,5],[-38,16],[-43,23],[-52,34],[-62,42],[-68,52],[-75,48],[-78,42],[-72,38],[-68,34],[-72,25],[-80,18]]},
+  {c:'#d4b896',pts:[[-10,36],[-8,44],[5,44],[10,48],[20,48],[24,58],[28,64],[15,70],[5,60],[0,50],[-10,36]]},
+  {c:'#d4b896',pts:[[-18,15],[-8,4],[10,4],[20,2],[30,-2],[38,-10],[36,-25],[28,-34],[18,-34],[12,-16],[4,-2],[-14,12]]},
+  {c:'#d4b896',pts:[[28,64],[60,72],[100,72],[130,70],[145,62],[130,42],[116,30],[100,14],[88,12],[76,30],[52,20],[40,10],[36,16],[28,42],[28,64]]},
+  {c:'#d4b896',pts:[[114,-22],[128,-16],[136,-12],[132,-22],[120,-30],[112,-24],[114,-22]]},
+  {c:'#d4b896',pts:[[120,-30],[132,-34],[142,-38],[140,-34],[128,-36],[118,-32],[120,-30]]},
+
+];
+
+function proj(lon,lat,ox){
+  return[((lon+180)/360)*(GR*2)+ox, ((90-lat)/180)*(GR*2)];
+}
+
+function draw(){
+  ctx.clearRect(0,0,W,W);
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(CX,CY,GR,0,Math.PI*2);
+  ctx.clip();
+
+  // Ocean
+  const og=ctx.createRadialGradient(CX,CY*0.85,0,CX,CY,GR);
+  og.addColorStop(0,'#daeef8');og.addColorStop(0.7,'#cce6f5');og.addColorStop(1,'#bdddf2');
+  ctx.fillStyle=og;ctx.fillRect(0,0,W,W);
+
+  // Continents
+  const tW=GR*2,bx=CX-GR,by=CY-GR,sc=gOff%tW;
+  [-1,0,1].forEach(t=>{
+    const ox=bx+sc+t*tW;
+    CONTINENTS.forEach(cont=>{
+      ctx.beginPath();
+      cont.pts.forEach(([lon,lat],i)=>{
+        const[lx,ly]=proj(lon,lat,0);
+        i===0?ctx.moveTo(ox+lx,by+ly):ctx.lineTo(ox+lx,by+ly);
+      });
+      ctx.closePath();
+      ctx.fillStyle=cont.c;
+      ctx.fill();
+    });
+  });
+
+  // Sheen
+  const sh=ctx.createRadialGradient(CX-GR*0.3,CY-GR*0.3,0,CX,CY,GR);
+  sh.addColorStop(0,'rgba(255,253,250,0.20)');sh.addColorStop(1,'rgba(255,253,250,0)');
+  ctx.fillStyle=sh;ctx.fillRect(0,0,W,W);
+
+  // South pole ice cap — small natural gradient at bottom
+  const sp=ctx.createRadialGradient(CX,CY+GR,0,CX,CY+GR,GR*0.38);
+  sp.addColorStop(0,'rgba(240,238,234,0.85)');
+  sp.addColorStop(0.6,'rgba(240,238,234,0.30)');
+  sp.addColorStop(1,'rgba(240,238,234,0)');
+  ctx.fillStyle=sp;ctx.fillRect(0,0,W,W);
+
+  ctx.restore();
+
+  gOff+=0.35;
+
+  // Update dot position to follow globe rotation
+  if(dotActive) {
+    const targetLon=116.4, targetLat=39.9;
+    const tileW=GR*2;
+    const normX=((targetLon+180)/360)*tileW;
+    const scroll=gOff%tileW;
+    let px=(CX-GR)+((normX+scroll)%tileW);
+    if(px<CX-GR) px+=tileW;
+    if(px>CX+GR) px-=tileW;
+    const py=(CY-GR)+((90-targetLat)/180)*tileW;
+    // Only show dot if within globe circle
+    const dx=px-CX, dy=py-CY;
+    if(Math.sqrt(dx*dx+dy*dy)<GR-4) {
+      dot.style.left=px+'px';
+      dot.style.top=py+'px';
+      dot.style.opacity=dot.classList.contains('on')?'1':'0';
+    } else {
+      dot.style.opacity='0'; // hide when rotated to back side
+    }
+  }
+
+  requestAnimationFrame(draw);
+}
+draw();
+
+// Show tagline after short delay
+setTimeout(function(){
+  var tl=document.getElementById('tagline');
+  if(tl) tl.classList.add('visible');
+}, 800);
+
+// Clock
+const clockEl=document.getElementById('clock');
+function tick(){const n=new Date(),p=x=>String(x).padStart(2,'0');clockEl.textContent=`${p(n.getHours())}:${p(n.getMinutes())}:${p(n.getSeconds())}`;}
+tick();setInterval(tick,1000);
+
+function fmtCoord(v,pos,neg){
+  const a=Math.abs(v),d=Math.floor(a),m=((a-d)*60).toFixed(1);
+  return v>=0?pos+' '+d+'°'+m+'′':neg+' '+d+'°'+m+'′';
+}
+function isBeijing(lat,lon){
+  return lat>=39.4&&lat<=41.1&&lon>=115.4&&lon<=117.5;
+}
+
+// ── REVEAL ANIMATIONS ─────────────────────────────────────────────
+function revealEl(id, delay){
+  setTimeout(()=>{
+    const el=document.getElementById(id);
+    if(el){ el.classList.add('reveal'); }
+  }, delay);
+}
+
+function revealLocation(zh, en, coords){
+  var lzh=document.getElementById('p-loc-zh');
+  var len=document.getElementById('p-loc-en');
+  var lco=document.getElementById('coords-top');
+  var meta=document.getElementById('pmeta');
+
+  if(lzh) lzh.textContent=zh;
+  if(len) len.textContent=en;
+  if(lco) lco.textContent=coords;
+
+  // Staggered location lines
+  revealEl('p-loc-zh', 0);
+  revealEl('p-loc-en', 280);
+  revealEl('coords-top', 520);
+  if(meta) setTimeout(()=>{ meta.style.opacity='1'; }, 720);
+
+  // Body text: 4 lines flowing out, 500ms apart
+  setTimeout(revealTextLines, 1200);
+}
+
+function revealTextLines(){
+  var ids=['tl1','tl2','tl3','tl4'];
+  ids.forEach(function(id,i){
+    setTimeout(function(){
+      var el=document.getElementById(id);
+      if(el) el.classList.add('reveal');
+    }, i*500);
+  });
+  // saveBtn is always visible — no need to show it
+}
+
+// ── GEOLOCATION ───────────────────────────────────────────────────
+function startGeolocation(){
+  const syncMsg=document.getElementById('syncMsg');
+
+  function hideSyncing(cb){
+    if(syncMsg){
+      syncMsg.style.transition='opacity 0.5s';
+      syncMsg.style.opacity='0';
+      setTimeout(()=>{ syncMsg.style.display='none'; if(cb) cb(); }, 550);
+    } else { if(cb) cb(); }
+  }
+
+  function doReveal(zh, en, coords){
+    hideSyncing(()=>revealLocation(zh, en, coords));
+  }
+
+  if(!navigator.geolocation){
+    doReveal('未知的时空节点','Location Unavailable','— · —');
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    pos=>{
+      const la=pos.coords.latitude, ln=pos.coords.longitude;
+      userLat=la; userLon=ln;
+      const coordStr=fmtCoord(la,'N','S')+' · '+fmtCoord(ln,'E','W');
+
+      if(isBeijing(la,ln)){
+        doReveal('中国 · 北京 · 朝阳大悦城','China · Beijing · Chaoyang Joy City', coordStr);
+        return;
+      }
+
+      // Try BigDataCloud reverse geocode
+      fetch('https://api.bigdatacloud.net/data/reverse-geocode-client?latitude='+la+'&longitude='+ln+'&localityLanguage=zh')
+        .then(r=>r.json())
+        .then(d=>{
+          const zh=[d.countryName,d.principalSubdivision,d.city||d.locality].filter(Boolean).join(' · ')||'未知的时空节点';
+          fetch('https://api.bigdatacloud.net/data/reverse-geocode-client?latitude='+la+'&longitude='+ln+'&localityLanguage=en')
+            .then(r=>r.json())
+            .then(d2=>{
+              const en=[d2.countryName,d2.principalSubdivision,d2.city||d2.locality].filter(Boolean).join(' · ')||'Unknown Location';
+              doReveal(zh, en, coordStr);
+            })
+            .catch(()=>doReveal(zh,'——',coordStr));
+        })
+        .catch(()=>doReveal('未知的时空节点','Location Unavailable',coordStr));
+    },
+    ()=>doReveal('未知的时空节点','定位未能获取','— · —'),
+    {timeout:8000, enableHighAccuracy:false}
+  );
+}
+
+// ── AUDIO ────────────────────────────────────────────────────────
+var _ac=null;
+function getAC(){
+  if(!_ac) _ac=new(window.AudioContext||window.webkitAudioContext)();
+  if(_ac.state==='suspended') _ac.resume();
+  return _ac;
+}
+
+function playWindChime(){
+  playShutter(); // 和"记录此刻"用同一个声音
+}
+
+function playShutter(){
+  try{
+    var ac=getAC();
+    var sr=ac.sampleRate;
+    function makeClick(startT,freq,decay,vol){
+      var dur=0.12;
+      var buf=ac.createBuffer(1,sr*dur,sr);
+      var data=buf.getChannelData(0);
+      for(var i=0;i<data.length;i++){
+        var t=i/sr;
+        data[i]=(Math.sin(2*Math.PI*freq*t)*0.6+(Math.random()*2-1)*0.4)*Math.exp(-t/decay);
+      }
+      var src=ac.createBufferSource();
+      var gain=ac.createGain(); gain.gain.value=vol;
+      src.buffer=buf; src.connect(gain); gain.connect(ac.destination);
+      src.start(ac.currentTime+startT);
+    }
+    makeClick(0,180,0.012,0.35);
+    makeClick(0.07,320,0.008,0.2);
+  }catch(e){}
+}
+
+// ── HAPTIC ────────────────────────────────────────────────────────
+function hapticLight(){
+  if(navigator.vibrate) navigator.vibrate(15);
+}
+function hapticSave(){
+  if(navigator.vibrate){
+    navigator.vibrate([25,40,15]);
+  } else {
+    var btn=document.getElementById('saveBtn');
+    if(btn){
+      btn.style.opacity='0.3';
+      setTimeout(function(){ btn.style.opacity='0.8'; },120);
+    }
+  }
+}
+
+// ── SAVE ──────────────────────────────────────────────────────────
+function saveThisMoment(){
+  hapticSave();
+  playShutter();
+  openDrawer();
+}
+function renameSelf(){
+  userName = '';
+  _renamingFromDrawer = true;
+  try { localStorage.removeItem('dangxia_name'); } catch(e) {}
+  closeDrawer();
+  setTimeout(showOnboarding, 350);
+}
+
+function openDrawer(){
+  var meta=document.getElementById('drawerMeta');
+  var now=new Date();
+  var p=function(x){return String(x).padStart(2,'0');};
+  var timeStr=p(now.getHours())+':'+p(now.getMinutes());
+  var locEl=document.getElementById('p-loc-zh');
+  var coordEl=document.getElementById('coords-top');
+  var loc=locEl?locEl.textContent:'';
+  var coord=coordEl?coordEl.textContent:'';
+  if(meta) meta.innerHTML=timeStr+(loc?'<br>'+loc:'')+(coord?'<br>'+coord:'');
+  // Scroll to top before opening so main page is in correct position
+  var scrollY=window.scrollY;
+  window.scrollTo(0,0);
+  document.body.style.overflow='hidden';
+  document.body.style.position='fixed';
+  document.body.style.top='0';
+  document.body.style.width='100%';
+  document.body.dataset.scrollY=scrollY;
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('drawer-overlay').classList.add('open');
+  // Show current name
+  var nameDisp=document.getElementById('drawerNameDisplay');
+  if(nameDisp) nameDisp.textContent=userName||'匿名';
+}
+function closeDrawer(){
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('drawer-overlay').classList.remove('open');
+  // Blur first to dismiss keyboard
+  if(document.activeElement) document.activeElement.blur();
+  // Reset body
+  document.body.style.position='';
+  document.body.style.top='';
+  document.body.style.width='';
+  document.body.style.overflow='';
+  // Force viewport scale reset on iOS
+  var mv=document.querySelector('meta[name=viewport]');
+  if(mv){
+    var orig=mv.content;
+    mv.content='width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no';
+    setTimeout(function(){ mv.content=orig; }, 50);
+  }
+}
+function drawerSave(){
+  playShutter();
+  closeDrawer();
+  document.getElementById('drawerInput').value='';
+  setTimeout(showStamp, 350);
+}
+
+function showStamp(){
+  // Generate NO. YYYYMMDD-HHMM
+  var now=new Date();
+  var pad=function(x){return String(x).padStart(2,'0');};
+  var dateStr=now.getFullYear()+pad(now.getMonth()+1)+pad(now.getDate());
+  var timeStr=pad(now.getHours())+pad(now.getMinutes());
+  document.getElementById('stampNo').textContent='NO. '+dateStr+'-'+timeStr;
+  var nameEl=document.getElementById('stampName');
+  if(nameEl) nameEl.textContent=userName||'';
+  var overlay=document.getElementById('stampOverlay');
+  overlay.classList.add('show');
+  // Auto dismiss — stamp drops down and falls off screen
+  setTimeout(function(){
+    var box=document.getElementById('stampBox');
+    // First: slight press
+    box.style.transition='transform 0.1s ease-in';
+    box.style.transform='translateY(4px) rotate(0.5deg)';
+    setTimeout(function(){
+      // Then: fall down with gravity (accelerate)
+      box.style.transition='transform 0.55s cubic-bezier(0.55,0,1,1), opacity 0.4s ease 0.2s';
+      box.style.transform='translateY(180px) rotate(8deg)';
+      box.style.opacity='0';
+      setTimeout(function(){ overlay.classList.remove('show'); }, 600);
+    }, 120);
+  }, 2500);
+}
+
+
+
+
+// ── ONBOARDING ────────────────────────────────────────────────────
+var userName = '';
+try { var _saved=localStorage.getItem('dangxia_name'); if(_saved) userName=_saved; } catch(e) {}
+
+function showOnboarding(){
+  if(userName) return;
+  // Remove old and create fresh overlay
+  var old=document.getElementById('onboarding');
+  if(old) old.remove();
+
+  var ob=document.createElement('div');
+  ob.id='onboarding';
+  ob.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;background:#f5f2ec;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 40px;box-sizing:border-box;opacity:0;transition:opacity 0.7s ease;';
+  ob.innerHTML=`
+    <p style="font-family:'Noto Serif SC',serif;font-weight:200;font-size:32px;letter-spacing:10px;color:rgba(33,31,27,0.88);margin:0 0 6px;text-align:center;">你是谁</p>
+    <p style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:16px;letter-spacing:4px;color:rgba(33,31,27,0.45);margin:0 0 32px;">who are you</p>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:40px;">
+      <div style="width:28px;height:0.5px;background:rgba(170,35,24,0.35);"></div>
+      <div style="width:4px;height:4px;border-radius:50%;background:#aa2318;opacity:0.7;"></div>
+      <div style="width:28px;height:0.5px;background:rgba(170,35,24,0.35);"></div>
+    </div>
+    <p style="font-family:'Noto Serif SC',serif;font-weight:300;font-size:13px;letter-spacing:3px;color:rgba(33,31,27,0.4);margin:0 0 10px;text-align:center;">输入你的名字 · your name</p>
+    <input id="obInput" type="text" placeholder="……"  autocomplete="off"
+      style="background:none;border:none;border-bottom:1px solid rgba(33,31,27,0.2);outline:none;font-family:'Noto Serif SC',serif;font-weight:300;font-size:26px;letter-spacing:6px;color:rgba(33,31,27,0.88);text-align:center;width:100%;max-width:260px;padding:10px 0;margin-bottom:44px;-webkit-text-size-adjust:100%;">
+    <button id="obConfirm" onclick="confirmName()"
+      style="display:flex;align-items:center;gap:12px;background:none;border:none;cursor:pointer;opacity:0.35;transition:opacity 0.3s;">
+      <div style="width:24px;height:0.5px;background:#aa2318;"></div>
+      <span style="font-family:'Noto Serif SC',serif;font-weight:400;font-size:15px;letter-spacing:5px;color:#aa2318;">确 认</span>
+      <div style="width:24px;height:0.5px;background:#aa2318;"></div>
+    </button>
+  `;
+  document.body.appendChild(ob);
+  setTimeout(function(){ ob.style.opacity='1'; }, 30);
+
+  var input=ob.querySelector('#obInput');
+  var btn=ob.querySelector('#obConfirm');
+  input.addEventListener('input',function(){
+    btn.style.opacity=input.value.trim().length>0?'1':'0.4';
+  });
+  input.addEventListener('keydown',function(e){
+    if(e.key==='Enter'&&input.value.trim().length>0) confirmName();
+  });
+}
+
+var _renamingFromDrawer=false;
+
+function confirmName(){
+  var input=document.getElementById('obInput')||document.querySelector('#onboarding #obInput');
+  if(!input) return;
+  var name=input.value.trim();
+  if(!name) return;
+  userName=name;
+  try { localStorage.setItem('dangxia_name', name); } catch(e) {}
+  // Hide onboarding
+  var ob=document.getElementById('onboarding');
+  if(ob){ ob.style.opacity='0'; setTimeout(function(){ ob.remove(); }, 600); }
+  // If renaming, reopen drawer
+  if(_renamingFromDrawer){
+    _renamingFromDrawer=false;
+    setTimeout(openDrawer, 650);
+  }
+}
+
+// ── GLOBE CLICK ───────────────────────────────────────────────────
+const stage=document.getElementById('stage');
+const dot=document.getElementById('dot');
+const panel=document.getElementById('panel');
+let done=false;
+
+stage.addEventListener('click',()=>{
+  if(done) return;
+  done=true;
+
+  hapticLight();
+  playWindChime();
+
+  document.getElementById('clouds').classList.add('gone');
+  document.getElementById('cta').classList.add('hidden');
+  var tl=document.getElementById('tagline');
+  tl.classList.remove('visible');
+  tl.classList.add('gone');
+  dotActive=true;
+  setTimeout(()=>dot.classList.add('on'), 1800);
+
+  stage.style.transition='margin-top 0.7s cubic-bezier(0.22,1,0.36,1)';
+  stage.style.marginTop='4px';
+
+  // Show onboarding after text has flowed (if not yet named)
+  setTimeout(showOnboarding, 2000);
+
+  // Step 1: panel slides up (500ms)
+  setTimeout(()=>{
+    panel.classList.add('show');
+
+    // Step 2: syncMsg appears (300ms after panel)
+    setTimeout(()=>{
+      var syncMsg=document.getElementById('syncMsg');
+      if(syncMsg){ syncMsg.style.display='block'; syncMsg.style.opacity='1'; }
+    }, 300);
+
+    // Step 3: after 2s total, reveal location then text
+    setTimeout(startGeolocation, 400);
+
+  }, 500);
+});
+</script>
+</body>
+</html>
