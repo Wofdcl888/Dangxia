@@ -561,6 +561,261 @@ header{
   to{opacity:1;transform:translateY(0);}
 }
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+/* ── CHRONICLE ICON ── */
+#chronicleBtn{
+  position:fixed;top:18px;right:18px;
+  z-index:200;
+  background:none;border:none;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;
+  opacity:0;transition:opacity 0.6s ease;
+}
+#chronicleBtn.show{opacity:1;}
+.chronicle-icon{
+  font-family:'Cormorant Garamond',serif;
+  font-size:18px;color:var(--ink);
+  opacity:0.6;
+}
+.chronicle-count{
+  font-family:'Cormorant Garamond',serif;
+  font-size:10px;letter-spacing:1px;
+  color:var(--red);opacity:0.8;
+}
+
+/* ── MOMENT CARD (存证单) ── */
+#momentCard{
+  position:fixed;inset:0;
+  z-index:250;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  background:rgba(33,31,27,0.55);
+  opacity:0;pointer-events:none;
+  transition:opacity 0.6s ease;
+  padding:24px;
+}
+#momentCard.show{opacity:1;pointer-events:all;}
+.card-paper{
+  background:var(--cream);
+  width:100%;max-width:340px;
+  border-radius:2px;
+  padding:28px 24px 20px;
+  box-shadow:0 12px 48px rgba(0,0,0,0.25);
+  position:relative;
+  transition:transform 0.6s cubic-bezier(0.22,1,0.36,1), opacity 0.5s ease;
+}
+.card-paper.fly-away{
+  transform:translate(60px,-60px) scale(0.3);
+  opacity:0;
+}
+.card-uuid{
+  font-family:'Cormorant Garamond',serif;
+  font-size:9px;letter-spacing:1.5px;
+  color:rgba(33,31,27,0.35);
+  margin-bottom:16px;
+  word-break:break-all;
+}
+.card-section{
+  margin-bottom:12px;
+  opacity:0;transition:opacity 0.8s ease;
+}
+.card-section.show{opacity:1;}
+.card-label{
+  font-family:'Cormorant Garamond',serif;
+  font-style:italic;font-size:10px;
+  letter-spacing:2px;color:rgba(33,31,27,0.35);
+  margin-bottom:4px;
+}
+.card-value{
+  font-family:'Noto Serif SC',serif;
+  font-weight:300;font-size:13px;
+  letter-spacing:1px;color:rgba(33,31,27,0.82);
+  line-height:1.7;
+}
+.card-freq{
+  font-family:'Cormorant Garamond',serif;
+  font-size:28px;font-weight:200;
+  color:var(--red);opacity:0.7;
+  letter-spacing:2px;
+}
+.card-history{
+  font-family:'Noto Serif SC',serif;
+  font-size:11px;font-weight:300;
+  color:rgba(33,31,27,0.38);
+  line-height:1.8;font-style:italic;
+}
+.card-rule{
+  width:100%;height:0.5px;
+  background:rgba(33,31,27,0.1);
+  margin:12px 0;
+}
+
+/* Globe light dots */
+.globe-dot{
+  position:absolute;
+  border-radius:50%;
+  background:rgba(255,255,255,0.85);
+  animation:breathe 2.4s ease-in-out infinite;
+  pointer-events:none;
+}
+@keyframes breathe{
+  0%,100%{opacity:0.2;transform:scale(1);}
+  50%{opacity:0.9;transform:scale(1.4);}
+}
+
+/* ── ECHO CARD (他人留言) ── */
+.echo-card{
+  margin-top:12px;
+  background:rgba(33,31,27,0.04);
+  border:0.5px solid rgba(33,31,27,0.1);
+  border-radius:2px;
+  padding:14px;
+  opacity:0;transition:opacity 0.8s ease;
+  position:relative;
+}
+.echo-card.show{opacity:1;}
+.echo-card.gold-flash{
+  border-color:rgba(180,140,60,0.8);
+  box-shadow:0 0 12px rgba(180,140,60,0.3);
+  animation:goldFlash 0.8s ease 3;
+}
+@keyframes goldFlash{
+  0%,100%{box-shadow:0 0 4px rgba(180,140,60,0.2);}
+  50%{box-shadow:0 0 20px rgba(180,140,60,0.6);}
+}
+.echo-text{
+  font-family:'Noto Serif SC',serif;
+  font-size:12px;font-weight:300;
+  color:rgba(33,31,27,0.72);
+  line-height:1.8;margin-bottom:6px;
+}
+.echo-city{
+  font-family:'Cormorant Garamond',serif;
+  font-size:11px;letter-spacing:2px;
+  color:rgba(33,31,27,0.35);
+}
+.echo-clue{
+  font-family:'Cormorant Garamond',serif;
+  font-size:11px;font-style:italic;
+  color:rgba(33,31,27,0.4);
+  margin-top:8px;
+  opacity:0;transition:opacity 0.6s ease;
+}
+.echo-clue.show{opacity:1;}
+.echo-greet-btn{
+  position:absolute;bottom:10px;right:10px;
+  background:none;border:0.5px solid rgba(33,31,27,0.25);
+  border-radius:50%;width:32px;height:32px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:14px;
+  transition:opacity 0.4s;
+}
+.echo-greet-btn.greeted{opacity:0.3;pointer-events:none;}
+
+/* Card flip */
+.card-flip-container{perspective:800px;}
+.card-flip-inner{
+  transition:transform 0.8s cubic-bezier(0.22,1,0.36,1);
+  transform-style:preserve-3d;
+  position:relative;
+}
+.card-flip-inner.flipped{transform:rotateY(180deg);}
+.card-front,.card-back{
+  backface-visibility:hidden;-webkit-backface-visibility:hidden;
+}
+.card-back{
+  position:absolute;inset:0;
+  transform:rotateY(180deg);
+  background:var(--cream);
+  border-radius:2px;
+  padding:28px 24px 20px;
+  display:flex;flex-direction:column;justify-content:center;align-items:center;
+  gap:16px;
+}
+.card-back-id{
+  font-family:'Cormorant Garamond',serif;
+  font-size:18px;letter-spacing:3px;
+  color:rgba(180,140,60,0.85);
+  text-align:center;word-break:break-all;
+}
+.card-back-btn{
+  background:none;border:0.5px solid rgba(33,31,27,0.3);
+  padding:8px 20px;border-radius:1px;cursor:pointer;
+  font-family:'Noto Serif SC',serif;font-size:12px;
+  letter-spacing:3px;color:rgba(33,31,27,0.7);
+}
+
+/* ── CHRONICLE DRAWER ── */
+#chronicleDrawer{
+  position:fixed;top:0;right:0;bottom:0;
+  width:88%;max-width:340px;
+  background:var(--cream);
+  z-index:280;
+  transform:translateX(100%);
+  transition:transform 0.45s cubic-bezier(0.22,1,0.36,1);
+  overflow-y:auto;
+  padding:48px 24px 40px;
+  -webkit-overflow-scrolling:touch;
+}
+#chronicleDrawer.open{transform:translateX(0);}
+#chronicleOverlay{
+  position:fixed;inset:0;z-index:270;
+  background:rgba(33,31,27,0.3);
+  opacity:0;pointer-events:none;
+  transition:opacity 0.4s;
+}
+#chronicleOverlay.open{opacity:1;pointer-events:all;}
+.chronicle-drawer-title{
+  font-family:'Noto Serif SC',serif;
+  font-weight:200;font-size:16px;letter-spacing:5px;
+  color:rgba(33,31,27,0.7);margin-bottom:28px;
+}
+.chronicle-item{
+  border-bottom:0.5px solid rgba(33,31,27,0.08);
+  padding:14px 0;cursor:pointer;
+}
+.chronicle-item-uuid{
+  font-family:'Cormorant Garamond',serif;
+  font-size:9px;letter-spacing:1px;
+  color:rgba(33,31,27,0.3);margin-bottom:4px;
+}
+.chronicle-item-text{
+  font-family:'Noto Serif SC',serif;
+  font-size:13px;font-weight:300;
+  color:rgba(33,31,27,0.75);
+  line-height:1.6;
+  display:-webkit-box;-webkit-line-clamp:2;
+  -webkit-box-orient:vertical;overflow:hidden;
+}
+.chronicle-item-loc{
+  font-family:'Cormorant Garamond',serif;
+  font-size:11px;letter-spacing:1.5px;
+  color:rgba(33,31,27,0.35);margin-top:4px;
+}
+.chronicle-empty{
+  font-family:'Cormorant Garamond',serif;
+  font-style:italic;font-size:14px;
+  color:rgba(33,31,27,0.3);letter-spacing:2px;
+  text-align:center;padding-top:40px;
+}
+
+/* Archive btn */
+.card-archive-btn{
+  width:100%;margin-top:16px;
+  background:none;border:0.5px solid rgba(33,31,27,0.2);
+  padding:12px;cursor:pointer;
+  font-family:'Noto Serif SC',serif;
+  font-size:12px;letter-spacing:4px;
+  color:rgba(33,31,27,0.55);
+  transition:opacity 0.3s;
+}
+
+/* Reply locked */
+.reply-locked{
+  font-family:'Cormorant Garamond',serif;
+  font-style:italic;font-size:12px;
+  color:rgba(33,31,27,0.35);letter-spacing:1px;
+  text-align:center;padding:8px 0;
+}
 </style>
 </head>
 <body>
@@ -1108,442 +1363,73 @@ stage.addEventListener('click',()=>{
   }, 500);
 });
 </script>
-</body>
-</html>
-</div>
-  <div class="dot" id="dot"></div>
-  <div id="cta">
-    <div class="cta-click">点 击</div>
-    <div class="cta-enter">进入此间</div>
-  </div>
-</div>
 
-<div id="tagline">
-  <div class="tagline-rule"><div class="tagline-rule-dot"></div></div>
-  <p class="tagline-main">在时间的荒野里，</p>
-  <p class="tagline-main">没有一秒是重复的。</p>
-  <p class="tagline-main tagline-gap">我们称之为，</p>
-  <p class="tagline-main tagline-em"><em>当下</em></p>
-</div>
+<!-- Chronicle icon -->
+<button id="chronicleBtn" onclick="openChronicle()">
+  <div class="chronicle-icon">⊚</div>
+  <div class="chronicle-count" id="chronicleCount"></div>
+</button>
 
-<div id="panel">
-  <div class="p-line"></div>
-  <p class="p-syncing" id="syncMsg" style="display:none;">正在同步星历…</p>
-  <p class="type-line" style="font-family:'Noto Serif SC',serif;font-weight:300;font-size:14px;letter-spacing:2px;color:var(--ink);margin-bottom:2px;" id="p-loc-zh"></p>
-  <p class="type-line" style="font-family:'Cormorant Garamond',serif;font-weight:400;font-size:13px;letter-spacing:2px;color:rgba(33,31,27,0.85);margin-bottom:3px;" id="p-loc-en"></p>
-  <p class="type-line" style="font-family:'Cormorant Garamond',serif;font-weight:400;font-size:14px;letter-spacing:2px;color:var(--red);margin-bottom:6px;" id="coords-top"></p>
-
-  <div class="p-meta" id="pmeta" style="opacity:0;transition:opacity 0.6s ease;">
-    <span class="p-time" id="clock">--:--:--</span>
-  </div>
-
-  <button class="save-btn" id="saveBtn" onclick="saveThisMoment()">
-    <div class="save-btn-icon"></div>
-    <span class="save-btn-text">记 录 此 刻</span>
-  </button>
-
-  <div style="width:100%;height:.5px;background:rgba(33,31,27,0.08);margin:16px 0 12px;"></div>
-
-  <div class="p-text" id="ptext">
-    <div class="type-line" id="tl1">时间从不等待，每一秒都是独一无二的存在。</div>
-    <div class="type-line" id="tl2">你站在这里，此刻的光线、气温、心跳，<em>都不会重演。</em></div>
-    <div class="type-line" id="tl3">不必抓住什么。</div>
-    <div class="type-line" id="tl4"><em>当下</em>，已经足够。</div>
-  </div>
-</div>
-
-<div id="drawer-overlay" onclick="closeDrawer()"></div>
-<div id="drawer">
-  <button class="drawer-close" onclick="closeDrawer()">关 闭</button>
-  <p class="drawer-title">记录此刻</p>
-  <p class="drawer-sub">this moment, preserved</p>
-  <div class="drawer-meta" id="drawerMeta"></div>
-  <button class="drawer-rename" id="drawerRename" onclick="renameSelf()">
-    <span id="drawerNameDisplay"></span>
-    <span class="drawer-rename-hint">修改署名</span>
-  </button>
-  <div class="drawer-divider"></div>
-  <textarea id="drawerInput" placeholder="此刻，你想说什么……" maxlength="500"></textarea>
-  <button class="drawer-save" onclick="drawerSave()">
-    <div class="drawer-save-line"></div>
-    <span class="drawer-save-text">封存此刻</span>
-  </button>
-</div>
-
-<div class="save-toast" id="saveToast"></div>
-<div id="onboarding">
-  <p class="ob-question">你是谁</p>
-  <p class="ob-sub">who are you</p>
-  <div class="ob-rule"><div class="ob-rule-dot"></div></div>
-  <input id="obInput" type="text" placeholder="输入你的名字"  autocomplete="off">
-  <button class="ob-confirm" id="obConfirm" onclick="confirmName()">
-    <div class="ob-confirm-line"></div>
-    <span class="ob-confirm-text">进入当下</span>
-  </button>
-</div>
-
-<div id="stampOverlay">
-  <div id="stampBox">
-    <div class="stamp-title">当 下</div>
-    <div class="stamp-rule"></div>
-    <div class="stamp-no" id="stampNo">NO. 20260225-0812</div>
-    <div class="stamp-name" id="stampName"></div>
-    <div class="stamp-sub">AT THIS MOMENT</div>
-  </div>
-</div>
-
-<script>
-const canvas=document.getElementById('c');
-const ctx=canvas.getContext('2d');
-const W=300,CX=150,CY=150,GR=110;
-let gOff=0, dotActive=false, userLat=39.9, userLon=116.4;
-
-const CONTINENTS=[
-  {c:'#d4b896',pts:[[-168,72],[-140,70],[-120,74],[-85,73],[-65,68],[-55,63],[-52,47],[-65,44],[-70,42],[-75,35],[-80,25],[-90,15],[-80,8],[-95,22],[-112,28],[-120,34],[-125,38],[-130,54],[-140,60],[-150,62],[-160,60],[-168,66]]},
-  {c:'#d4b896',pts:[[-80,12],[-63,8],[-50,4],[-35,5],[-38,16],[-43,23],[-52,34],[-62,42],[-68,52],[-75,48],[-78,42],[-72,38],[-68,34],[-72,25],[-80,18]]},
-  {c:'#d4b896',pts:[[-10,36],[-8,44],[5,44],[10,48],[20,48],[24,58],[28,64],[15,70],[5,60],[0,50],[-10,36]]},
-  {c:'#d4b896',pts:[[-18,15],[-8,4],[10,4],[20,2],[30,-2],[38,-10],[36,-25],[28,-34],[18,-34],[12,-16],[4,-2],[-14,12]]},
-  {c:'#d4b896',pts:[[28,64],[60,72],[100,72],[130,70],[145,62],[130,42],[116,30],[100,14],[88,12],[76,30],[52,20],[40,10],[36,16],[28,42],[28,64]]},
-  {c:'#d4b896',pts:[[114,-22],[128,-16],[136,-12],[132,-22],[120,-30],[112,-24],[114,-22]]},
-  {c:'#d4b896',pts:[[120,-30],[132,-34],[142,-38],[140,-34],[128,-36],[118,-32],[120,-30]]},
-];
-
-function proj(lon,lat,ox){
-  return[((lon+180)/360)*(GR*2)+ox, ((90-lat)/180)*(GR*2)];
-}
-
-function draw(){
-  ctx.clearRect(0,0,W,W);
-  ctx.save();
-  ctx.beginPath();
-  ctx.arc(CX,CY,GR,0,Math.PI*2);
-  ctx.clip();
-  const og=ctx.createRadialGradient(CX,CY*0.85,0,CX,CY,GR);
-  og.addColorStop(0,'#daeef8');og.addColorStop(0.7,'#cce6f5');og.addColorStop(1,'#bdddf2');
-  ctx.fillStyle=og;ctx.fillRect(0,0,W,W);
-  const tW=GR*2,bx=CX-GR,by=CY-GR,sc=gOff%tW;
-  [-1,0,1].forEach(t=>{
-    const ox=bx+sc+t*tW;
-    CONTINENTS.forEach(cont=>{
-      ctx.beginPath();
-      cont.pts.forEach(([lon,lat],i)=>{
-        const[lx,ly]=proj(lon,lat,0);
-        i===0?ctx.moveTo(ox+lx,by+ly):ctx.lineTo(ox+lx,by+ly);
-      });
-      ctx.closePath();
-      ctx.fillStyle=cont.c;
-      ctx.fill();
-    });
-  });
-  const sh=ctx.createRadialGradient(CX-GR*0.3,CY-GR*0.3,0,CX,CY,GR);
-  sh.addColorStop(0,'rgba(255,253,250,0.20)');sh.addColorStop(1,'rgba(255,253,250,0)');
-  ctx.fillStyle=sh;ctx.fillRect(0,0,W,W);
-  const sp=ctx.createRadialGradient(CX,CY+GR,0,CX,CY+GR,GR*0.38);
-  sp.addColorStop(0,'rgba(240,238,234,0.85)');
-  sp.addColorStop(0.6,'rgba(240,238,234,0.30)');
-  sp.addColorStop(1,'rgba(240,238,234,0)');
-  ctx.fillStyle=sp;ctx.fillRect(0,0,W,W);
-  ctx.restore();
-  gOff+=0.35;
-  if(dotActive) {
-    const targetLon=userLon, targetLat=userLat;
-    const tileW=GR*2;
-    const normX=((targetLon+180)/360)*tileW;
-    const scroll=gOff%tileW;
-    let px=(CX-GR)+((normX+scroll)%tileW);
-    if(px<CX-GR) px+=tileW;
-    if(px>CX+GR) px-=tileW;
-    const py=(CY-GR)+((90-targetLat)/180)*tileW;
-    const dx=px-CX, dy=py-CY;
-    if(Math.sqrt(dx*dx+dy*dy)<GR-4) {
-      dot.style.left=px+'px';
-      dot.style.top=py+'px';
-      dot.style.opacity=dot.classList.contains('on')?'1':'0';
-    } else {
-      dot.style.opacity='0';
-    }
-  }
-  requestAnimationFrame(draw);
-}
-draw();
-
-setTimeout(function(){
-  var tl=document.getElementById('tagline');
-  if(tl) tl.classList.add('visible');
-}, 800);
-
-const clockEl=document.getElementById('clock');
-function tick(){const n=new Date(),p=x=>String(x).padStart(2,'0');clockEl.textContent=`${p(n.getHours())}:${p(n.getMinutes())}:${p(n.getSeconds())}`;}
-tick();setInterval(tick,1000);
-
-function fmtCoord(v,pos,neg){
-  const a=Math.abs(v),d=Math.floor(a),m=((a-d)*60).toFixed(1);
-  return v>=0?pos+' '+d+'°'+m+'′':neg+' '+d+'°'+m+'′';
-}
-
-function revealEl(id, delay){
-  setTimeout(()=>{
-    const el=document.getElementById(id);
-    if(el){ el.classList.add('reveal'); }
-  }, delay);
-}
-
-function revealLocation(zh, en, coords){
-  var lzh=document.getElementById('p-loc-zh');
-  var len=document.getElementById('p-loc-en');
-  var lco=document.getElementById('coords-top');
-  var meta=document.getElementById('pmeta');
-  if(lzh) lzh.textContent=zh;
-  if(len) len.textContent=en;
-  if(lco) lco.textContent=coords;
-  revealEl('p-loc-zh', 0);
-  revealEl('p-loc-en', 280);
-  revealEl('coords-top', 520);
-  if(meta) setTimeout(()=>{ meta.style.opacity='1'; }, 720);
-  setTimeout(revealTextLines, 1200);
-}
-
-function revealTextLines(){
-  var ids=['tl1','tl2','tl3','tl4'];
-  ids.forEach(function(id,i){
-    setTimeout(function(){
-      var el=document.getElementById(id);
-      if(el) el.classList.add('reveal');
-    }, i*500);
-  });
-}
-
-function startGeolocation(){
-  const syncMsg=document.getElementById('syncMsg');
-  function hideSyncing(cb){
-    if(syncMsg){
-      syncMsg.style.transition='opacity 0.5s';
-      syncMsg.style.opacity='0';
-      setTimeout(()=>{ syncMsg.style.display='none'; if(cb) cb(); }, 550);
-    } else { if(cb) cb(); }
-  }
-  function doReveal(zh, en, coords){
-    hideSyncing(()=>revealLocation(zh, en, coords));
-  }
-  if(!navigator.geolocation){
-    doReveal('未知的时空节点','Location Unavailable','— · —');
-    return;
-  }
-  navigator.geolocation.getCurrentPosition(
-    pos=>{
-      const la=pos.coords.latitude, ln=pos.coords.longitude;
-      userLat=la; userLon=ln;
-      const coordStr=fmtCoord(la,'N','S')+' · '+fmtCoord(ln,'E','W');
-      fetch('https://api.bigdatacloud.net/data/reverse-geocode-client?latitude='+la+'&longitude='+ln+'&localityLanguage=zh')
-        .then(r=>r.json())
-        .then(d=>{
-          const zh=[d.countryName,d.principalSubdivision,d.city||d.locality].filter(Boolean).join(' · ')||'未知的时空节点';
-          fetch('https://api.bigdatacloud.net/data/reverse-geocode-client?latitude='+la+'&longitude='+ln+'&localityLanguage=en')
-            .then(r=>r.json())
-            .then(d2=>{
-              const en=[d2.countryName,d2.principalSubdivision,d2.city||d2.locality].filter(Boolean).join(' · ')||'Unknown Location';
-              doReveal(zh, en, coordStr);
-            })
-            .catch(()=>doReveal(zh,'——',coordStr));
-        })
-        .catch(()=>doReveal('未知的时空节点','Location Unavailable',coordStr));
-    },
-    ()=>doReveal('未知的时空节点','定位未能获取','— · —'),
-    {timeout:8000, enableHighAccuracy:false}
-  );
-}
-
-var _ac=null;
-function getAC(){
-  if(!_ac) _ac=new(window.AudioContext||window.webkitAudioContext)();
-  if(_ac.state==='suspended') _ac.resume();
-  return _ac;
-}
-function playWindChime(){ playShutter(); }
-function playShutter(){
-  try{
-    var ac=getAC();
-    var sr=ac.sampleRate;
-    function makeClick(startT,freq,decay,vol){
-      var dur=0.12;
-      var buf=ac.createBuffer(1,sr*dur,sr);
-      var data=buf.getChannelData(0);
-      for(var i=0;i<data.length;i++){
-        var t=i/sr;
-        data[i]=(Math.sin(2*Math.PI*freq*t)*0.6+(Math.random()*2-1)*0.4)*Math.exp(-t/decay);
-      }
-      var src=ac.createBufferSource();
-      var gain=ac.createGain(); gain.gain.value=vol;
-      src.buffer=buf; src.connect(gain); gain.connect(ac.destination);
-      src.start(ac.currentTime+startT);
-    }
-    makeClick(0,180,0.012,0.35);
-    makeClick(0.07,320,0.008,0.2);
-  }catch(e){}
-}
-function hapticLight(){ if(navigator.vibrate) navigator.vibrate(15); }
-function hapticSave(){ if(navigator.vibrate){ navigator.vibrate([25,40,15]); } }
-
-function saveThisMoment(){ hapticSave(); playShutter(); openDrawer(); }
-function renameSelf(){
-  userName = '';
-  _renamingFromDrawer = true;
-  try { localStorage.removeItem('dangxia_name'); } catch(e) {}
-  closeDrawer();
-  setTimeout(showOnboarding, 350);
-}
-function openDrawer(){
-  var meta=document.getElementById('drawerMeta');
-  var now=new Date();
-  var p=function(x){return String(x).padStart(2,'0');};
-  var timeStr=p(now.getHours())+':'+p(now.getMinutes());
-  var locEl=document.getElementById('p-loc-zh');
-  var coordEl=document.getElementById('coords-top');
-  var loc=locEl?locEl.textContent:'';
-  var coord=coordEl?coordEl.textContent:'';
-  if(meta) meta.innerHTML=timeStr+(loc?'<br>'+loc:'')+(coord?'<br>'+coord:'');
-  var scrollY=window.scrollY;
-  window.scrollTo(0,0);
-  document.body.style.overflow='hidden';
-  document.body.style.position='fixed';
-  document.body.style.top='0';
-  document.body.style.width='100%';
-  document.body.dataset.scrollY=scrollY;
-  document.getElementById('drawer').classList.add('open');
-  document.getElementById('drawer-overlay').classList.add('open');
-  var nameDisp=document.getElementById('drawerNameDisplay');
-  if(nameDisp) nameDisp.textContent=userName||'匿名';
-}
-function closeDrawer(){
-  document.getElementById('drawer').classList.remove('open');
-  document.getElementById('drawer-overlay').classList.remove('open');
-  if(document.activeElement) document.activeElement.blur();
-  document.body.style.position='';
-  document.body.style.top='';
-  document.body.style.width='';
-  document.body.style.overflow='';
-  var mv=document.querySelector('meta[name=viewport]');
-  if(mv){
-    var orig=mv.content;
-    mv.content='width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no';
-    setTimeout(function(){ mv.content=orig; }, 50);
-  }
-}
-function drawerSave(){
-  playShutter();
-  closeDrawer();
-  document.getElementById('drawerInput').value='';
-  setTimeout(showStamp, 350);
-}
-function showStamp(){
-  var now=new Date();
-  var pad=function(x){return String(x).padStart(2,'0');};
-  var dateStr=now.getFullYear()+pad(now.getMonth()+1)+pad(now.getDate());
-  var timeStr=pad(now.getHours())+pad(now.getMinutes());
-  document.getElementById('stampNo').textContent='NO. '+dateStr+'-'+timeStr;
-  var nameEl=document.getElementById('stampName');
-  if(nameEl) nameEl.textContent=userName||'';
-  var overlay=document.getElementById('stampOverlay');
-  overlay.classList.add('show');
-  setTimeout(function(){
-    var box=document.getElementById('stampBox');
-    box.style.transition='transform 0.1s ease-in';
-    box.style.transform='translateY(4px) rotate(0.5deg)';
-    setTimeout(function(){
-      box.style.transition='transform 0.55s cubic-bezier(0.55,0,1,1), opacity 0.4s ease 0.2s';
-      box.style.transform='translateY(180px) rotate(8deg)';
-      box.style.opacity='0';
-      setTimeout(function(){ overlay.classList.remove('show'); }, 600);
-    }, 120);
-  }, 2500);
-}
-
-var userName = '';
-try { var _saved=localStorage.getItem('dangxia_name'); if(_saved) userName=_saved; } catch(e) {}
-
-function showOnboarding(){
-  if(userName) return;
-  var old=document.getElementById('onboarding');
-  if(old) old.remove();
-  var ob=document.createElement('div');
-  ob.id='onboarding';
-  ob.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;background:#f5f2ec;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 40px;box-sizing:border-box;opacity:0;transition:opacity 0.7s ease;';
-  ob.innerHTML=`
-    <p style="font-family:'Noto Serif SC',serif;font-weight:200;font-size:32px;letter-spacing:10px;color:rgba(33,31,27,0.88);margin:0 0 6px;text-align:center;">你是谁</p>
-    <p style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:16px;letter-spacing:4px;color:rgba(33,31,27,0.45);margin:0 0 32px;">who are you</p>
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:40px;">
-      <div style="width:28px;height:0.5px;background:rgba(170,35,24,0.35);"></div>
-      <div style="width:4px;height:4px;border-radius:50%;background:#aa2318;opacity:0.7;"></div>
-      <div style="width:28px;height:0.5px;background:rgba(170,35,24,0.35);"></div>
+<!-- Moment Card overlay -->
+<div id="momentCard">
+  <div class="card-flip-container" style="width:100%;max-width:340px;">
+    <div class="card-flip-inner" id="cardFlipInner">
+      <div class="card-front">
+        <div class="card-paper" id="cardPaper">
+          <div class="card-uuid" id="cardUUID"></div>
+          <div class="card-section" id="cs1">
+            <div class="card-label">此刻感受</div>
+            <div class="card-value" id="cardText"></div>
+          </div>
+          <div class="card-rule"></div>
+          <div class="card-section" id="cs2">
+            <div class="card-label">时空坐标</div>
+            <div class="card-value" id="cardCoords"></div>
+          </div>
+          <div class="card-section" id="cs3">
+            <div class="card-label">同频指数</div>
+            <div class="card-freq" id="cardFreq"></div>
+          </div>
+          <div class="card-section" id="cs4">
+            <div class="card-history" id="cardHistory"></div>
+          </div>
+          <div class="card-section echo-card" id="echoCard">
+            <div class="card-label">来自时间另一端</div>
+            <div class="echo-text" id="echoText"></div>
+            <div class="echo-city" id="echoCity"></div>
+            <div class="echo-clue" id="echoClue1"></div>
+            <div class="echo-clue" id="echoClue2" style="color:rgba(180,140,60,0.75);font-style:normal;letter-spacing:1px;"></div>
+            <button class="echo-greet-btn" id="echoGreetBtn" onclick="greetEcho()">〜</button>
+          </div>
+          <button class="card-archive-btn" id="archiveBtn" onclick="archiveMoment()">⊚ 刻入我的时空年轮</button>
+        </div>
+      </div>
+      <div class="card-back" id="cardBack">
+        <div class="card-label" style="letter-spacing:3px;">信标已解锁</div>
+        <div class="card-back-id" id="cardBackId"></div>
+        <div style="display:flex;gap:12px;">
+          <button class="card-back-btn" onclick="copyBeacon()">寻 踪</button>
+          <button class="card-back-btn" id="leaveBookBtn" onclick="showLeaveBook()">留 书</button>
+        </div>
+        <div id="leaveBookArea" style="display:none;width:100%;">
+          <textarea id="leaveBookInput" maxlength="50" placeholder="写下你想说的……"
+            style="width:100%;background:none;border:none;border-bottom:0.5px solid rgba(33,31,27,0.2);
+            outline:none;font-family:'Noto Serif SC',serif;font-size:13px;color:var(--ink);
+            padding:8px 0;resize:none;height:70px;letter-spacing:1px;"></textarea>
+          <button class="card-back-btn" style="margin-top:8px;width:100%;" onclick="submitLeaveBook()">投 递</button>
+        </div>
+        <button class="card-back-btn" onclick="closeCard()" style="margin-top:8px;opacity:0.4;font-size:11px;">关 闭</button>
+      </div>
     </div>
-    <p style="font-family:'Noto Serif SC',serif;font-weight:300;font-size:13px;letter-spacing:3px;color:rgba(33,31,27,0.4);margin:0 0 10px;text-align:center;">输入你的名字 · your name</p>
-    <input id="obInput" type="text" placeholder="……" autocomplete="off"
-      style="background:none;border:none;border-bottom:1px solid rgba(33,31,27,0.2);outline:none;font-family:'Noto Serif SC',serif;font-weight:300;font-size:26px;letter-spacing:6px;color:rgba(33,31,27,0.88);text-align:center;width:100%;max-width:260px;padding:10px 0;margin-bottom:44px;-webkit-text-size-adjust:100%;">
-    <button id="obConfirm" onclick="confirmName()"
-      style="display:flex;align-items:center;gap:12px;background:none;border:none;cursor:pointer;opacity:0.35;transition:opacity 0.3s;">
-      <div style="width:24px;height:0.5px;background:#aa2318;"></div>
-      <span style="font-family:'Noto Serif SC',serif;font-weight:400;font-size:15px;letter-spacing:5px;color:#aa2318;">确 认</span>
-      <div style="width:24px;height:0.5px;background:#aa2318;"></div>
-    </button>
-  `;
-  document.body.appendChild(ob);
-  setTimeout(function(){ ob.style.opacity='1'; }, 30);
-  var input=ob.querySelector('#obInput');
-  var btn=ob.querySelector('#obConfirm');
-  input.addEventListener('input',function(){
-    btn.style.opacity=input.value.trim().length>0?'1':'0.4';
-  });
-  input.addEventListener('keydown',function(e){
-    if(e.key==='Enter'&&input.value.trim().length>0) confirmName();
-  });
-}
+  </div>
+</div>
 
-var _renamingFromDrawer=false;
+<!-- Chronicle Drawer -->
+<div id="chronicleOverlay" onclick="closeChronicle()"></div>
+<div id="chronicleDrawer">
+  <div class="chronicle-drawer-title">时空年轮</div>
+  <div id="chronicleList"></div>
+</div>
 
-function confirmName(){
-  var input=document.getElementById('obInput')||document.querySelector('#onboarding #obInput');
-  if(!input) return;
-  var name=input.value.trim();
-  if(!name) return;
-  userName=name;
-  try { localStorage.setItem('dangxia_name', name); } catch(e) {}
-  var ob=document.getElementById('onboarding');
-  if(ob){ ob.style.opacity='0'; setTimeout(function(){ ob.remove(); }, 600); }
-  if(_renamingFromDrawer){
-    _renamingFromDrawer=false;
-    setTimeout(openDrawer, 650);
-  }
-}
-
-const stage=document.getElementById('stage');
-const dot=document.getElementById('dot');
-const panel=document.getElementById('panel');
-let done=false;
-
-stage.addEventListener('click',()=>{
-  if(done) return;
-  done=true;
-  hapticLight();
-  playWindChime();
-  document.getElementById('clouds').classList.add('gone');
-  document.getElementById('cta').classList.add('hidden');
-  var tl=document.getElementById('tagline');
-  tl.classList.remove('visible');
-  tl.classList.add('gone');
-  dotActive=true;
-  setTimeout(()=>dot.classList.add('on'), 1800);
-  stage.style.transition='margin-top 0.7s cubic-bezier(0.22,1,0.36,1)';
-  stage.style.marginTop='4px';
-  setTimeout(showOnboarding, 2000);
-  setTimeout(()=>{
-    panel.classList.add('show');
-    setTimeout(()=>{
-      var syncMsg=document.getElementById('syncMsg');
-      if(syncMsg){ syncMsg.style.display='block'; syncMsg.style.opacity='1'; }
-    }, 300);
-    setTimeout(startGeolocation, 400);
-  }, 500);
-});
-</script>
 </body>
 </html>
