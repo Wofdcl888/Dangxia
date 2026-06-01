@@ -1564,7 +1564,7 @@ const dot=document.getElementById('dot');
 const panel=document.getElementById('panel');
 let done=false;
 
-stage.addEventListener('click',function(e){
+function enterStage(){
   if(done) return;
   done=true;
 
@@ -1599,6 +1599,14 @@ stage.addEventListener('click',function(e){
     setTimeout(startGeolocation, 400);
 
   }, 500);
+}
+
+stage.addEventListener('touchstart', function(e){
+  e.preventDefault();
+  enterStage();
+}, {passive:false});
+stage.addEventListener('click', function(e){
+  enterStage();
 });
 </script>
 
