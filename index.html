@@ -1220,39 +1220,275 @@ function closeDrawer(){
     setTimeout(function(){ mv.content=orig; }, 50);
   }
 }
-function drawerSave(){
-  playShutter();
-  closeDrawer();
-  document.getElementById('drawerInput').value='';
-  setTimeout(showStamp, 350);
+// ── PRESET DATA ──────────────────────────────────────────────────────
+var HISTORY_ECHOES = [
+  '1969年7月20日，人类第一次在月球上留下脚印。阿姆斯特朗说，这是个人的一小步。',
+  '1989年11月9日，柏林墙倒塌。分裂二十八年的城市，在一个夜晚重新相遇。',
+  '2003年2月1日，哥伦比亚号航天飞机解体于大气层。七名宇航员在返回地球的最后时刻消失。',
+  '1986年4月26日凌晨，切尔诺贝利核电站四号反应堆爆炸。那夜的天空，据说是蓝色的。',
+  '1945年8月6日8时15分，广岛上空的一道光。此后三年，影子被永久烙印在石阶上。',
+  '2011年3月11日，东日本大地震。海浪吞没了村庄，时钟停在了14:46。',
+  '1912年4月15日，泰坦尼克号沉没。最后一首曲子，据说是《与主更亲近》。',
+  '2020年1月，一种新型病毒开始在人群中流传。那时无人知晓，世界即将改变。',
+];
+
+var ECHO_LIBRARY = [
+  {text:'今天的咖啡喝完了，窗外还在下雨。不知道为什么，我一直在等一条不会来的消息。',location:'上海',clue_level_1:'窗外有雨声，房间里有某首法语歌在循环。',clue_level_2:'@muted_tide · Telegram'},
+  {text:'刚刚在便利店看到一对老夫妻，他帮她系围巾。我站在冷饮柜前站了很久。',location:'京都',clue_level_1:'背景音是寺院的钟声，空气里有柴火的气味。',clue_level_2:'thread: still_here_2047 · Mastodon'},
+  {text:'我妈今天问我什么时候找对象，我说我在等一个懂得沉默的人。她说我太难了。',location:'成都',clue_level_1:'四川话的方言声，麻辣烫店的蒸汽。',clue_level_2:'douban：慢递信箱No.7'},
+  {text:'三十岁的生日，一个人吃了一碗泡面。泡面很好吃，我哭了一下，又觉得还好。',location:'北京',clue_level_1:'远处有施工的声音，是深夜的北三环。',clue_level_2:'即刻：not_yet_ready'},
+  {text:'失业第47天，今天出门走了三公里，看到一只猫坐在废弃商铺的台阶上晒太阳。',location:'深圳',clue_level_1:'粤语广播，远处地铁的轰鸣声。',clue_level_2:'Signal: +ghost_frequency'},
+  {text:'和他分手的第200天，我终于可以听那首歌了。只是哭的原因，已经不一样了。',location:'香港',clue_level_1:'维港的船鸣，还有某个屋顶的风声。',clue_level_2:'小红书：消失的海浪'},
+  {text:'今晚我把房间里最后一盆植物送给了邻居。我要离开这座城市了，去哪里还不知道。',location:'广州',clue_level_1:'热带夜晚的蝉鸣，远处的鞭炮声。',clue_level_2:'Twitter/X: @softnoise_'},
+  {text:'凌晨两点，我一个人在医院走廊等消息。自动贩卖机的灯是整条走廊最亮的东西。',location:'武汉',clue_level_1:'消毒水的气味，病历车轮子的声音。',clue_level_2:'豆瓣小组：深夜候诊室'},
+];
+
+function generateUUID(){
+  var now=new Date();
+  var pad=function(x,n){return String(x).padStart(n||2,'0');};
+  var hex=Math.floor(Math.random()*0xFFFFFFFF).toString(16).padStart(8,'0').toUpperCase();
+  return 'MOMENT-'+now.getFullYear()+'-'+pad(now.getMonth()+1)+pad(now.getDate())+'-'+hex;
 }
 
-function showStamp(){
-  // Generate NO. YYYYMMDD-HHMM
-  var now=new Date();
-  var pad=function(x){return String(x).padStart(2,'0');};
-  var dateStr=now.getFullYear()+pad(now.getMonth()+1)+pad(now.getDate());
-  var timeStr=pad(now.getHours())+pad(now.getMinutes());
-  document.getElementById('stampNo').textContent='NO. '+dateStr+'-'+timeStr;
-  var nameEl=document.getElementById('stampName');
-  if(nameEl) nameEl.textContent=userName||'';
-  var overlay=document.getElementById('stampOverlay');
-  overlay.classList.add('show');
-  // Auto dismiss — stamp drops down and falls off screen
-  setTimeout(function(){
-    var box=document.getElementById('stampBox');
-    // First: slight press
-    box.style.transition='transform 0.1s ease-in';
-    box.style.transform='translateY(4px) rotate(0.5deg)';
-    setTimeout(function(){
-      // Then: fall down with gravity (accelerate)
-      box.style.transition='transform 0.55s cubic-bezier(0.55,0,1,1), opacity 0.4s ease 0.2s';
-      box.style.transform='translateY(180px) rotate(8deg)';
-      box.style.opacity='0';
-      setTimeout(function(){ overlay.classList.remove('show'); }, 600);
-    }, 120);
-  }, 2500);
+var currentMoment = null;
+var currentMomentIsNew = false;
+
+function drawerSave(){
+  playShutter();
+  var userText = document.getElementById('drawerInput').value.trim();
+  closeDrawer();
+  document.getElementById('drawerInput').value='';
+  var now = new Date();
+  var coordEl = document.getElementById('coords-top');
+  var locZh = document.getElementById('p-loc-zh');
+  var coords = coordEl ? coordEl.textContent : '未知坐标';
+  var location = locZh ? locZh.textContent : '未知的时空节点';
+  var echo = ECHO_LIBRARY[Math.floor(Math.random()*ECHO_LIBRARY.length)];
+  var history = HISTORY_ECHOES[Math.floor(Math.random()*HISTORY_ECHOES.length)];
+  currentMoment = {
+    uuid: generateUUID(),
+    timestamp: now.getTime(),
+    userText: userText || '（无言的此刻）',
+    coordinates: coords,
+    location: location,
+    frequencyIndex: Math.floor(Math.random()*451)+50,
+    historyEcho: history,
+    echoData: {
+      text: echo.text,
+      location: echo.location,
+      clue_level_1: echo.clue_level_1,
+      clue_level_2: echo.clue_level_2,
+      unlockedLevel: 0,
+      isEchoGreeted: false,
+      replyText: '',
+      openCount: 0
+    },
+    archived: false
+  };
+  currentMomentIsNew = true;
+  setTimeout(showMomentCard, 350);
 }
+
+function showMomentCard(moment){
+  if(moment) { currentMoment=moment; currentMomentIsNew=false; }
+  var m = currentMoment;
+  if(!m) return;
+  var flipInner = document.getElementById('cardFlipInner');
+  flipInner.classList.remove('flipped');
+  document.getElementById('cardPaper').classList.remove('fly-away');
+  document.getElementById('archiveBtn').style.display = currentMomentIsNew ? 'block' : 'none';
+  document.getElementById('cardUUID').textContent = m.uuid;
+  document.getElementById('cardText').textContent = m.userText;
+  document.getElementById('cardCoords').textContent = (m.location||'') + ' · ' + m.coordinates;
+  document.getElementById('cardFreq').textContent = m.frequencyIndex + ' Hz';
+  document.getElementById('cardHistory').textContent = m.historyEcho;
+  document.getElementById('cardBackId').textContent = m.echoData.clue_level_2;
+  document.getElementById('leaveBookArea').style.display='none';
+  var echoCard = document.getElementById('echoCard');
+  document.getElementById('echoText').textContent = m.echoData.text;
+  document.getElementById('echoCity').textContent = '· ' + m.echoData.location + ' ·';
+  var greetBtn = document.getElementById('echoGreetBtn');
+  var clue1 = document.getElementById('echoClue1');
+  var clue2 = document.getElementById('echoClue2');
+  if(m.echoData.isEchoGreeted){
+    greetBtn.classList.add('greeted');
+    clue1.textContent = m.echoData.clue_level_1;
+    clue1.classList.add('show');
+  } else {
+    greetBtn.classList.remove('greeted');
+    clue1.classList.remove('show');
+  }
+  if(m.echoData.unlockedLevel >= 2){
+    echoCard.classList.add('gold-flash');
+    clue2.textContent = m.echoData.clue_level_2;
+    clue2.classList.add('show');
+    setTimeout(function(){ flipInner.classList.add('flipped'); }, 1200);
+  } else {
+    echoCard.classList.remove('gold-flash');
+    clue2.classList.remove('show');
+  }
+  if(m.echoData.replyText){
+    document.getElementById('leaveBookBtn').textContent='纸飞机已飞向未来的那一端。';
+    document.getElementById('leaveBookBtn').disabled=true;
+  } else {
+    document.getElementById('leaveBookBtn').textContent='留 书';
+    document.getElementById('leaveBookBtn').disabled=false;
+  }
+  var card = document.getElementById('momentCard');
+  card.style.display='flex';
+  setTimeout(function(){ card.classList.add('show'); }, 20);
+  ['cs1','cs2'].forEach(function(id){ document.getElementById(id).classList.add('show'); });
+  setTimeout(function(){ document.getElementById('cs3').classList.add('show'); }, 800);
+  setTimeout(function(){ document.getElementById('cs4').classList.add('show'); }, 1600);
+  setTimeout(function(){ echoCard.classList.add('show'); }, 2400);
+  if(currentMomentIsNew){
+    var c = document.getElementById('c');
+    setTimeout(function(){ c.style.transition='filter 3s ease'; c.style.filter='grayscale(100%)'; }, 0);
+    setTimeout(addGlobeDots, 1600);
+  }
+  if(!currentMomentIsNew && m.echoData.unlockedLevel < 2){
+    m.echoData.openCount = (m.echoData.openCount||0) + 1;
+    if(m.echoData.openCount >= 3 && m.echoData.isEchoGreeted){
+      m.echoData.unlockedLevel = 2;
+      saveChronicle();
+      setTimeout(function(){
+        echoCard.classList.add('gold-flash');
+        clue2.textContent = m.echoData.clue_level_2;
+        clue2.classList.add('show');
+        setTimeout(function(){ flipInner.classList.add('flipped'); }, 800);
+      }, 500);
+    }
+    saveChronicle();
+  }
+}
+
+function addGlobeDots(){
+  var stage = document.getElementById('stage');
+  [0,1,2].forEach(function(i){
+    var d=document.createElement('div');
+    d.className='globe-dot';
+    var size=4+Math.random()*5;
+    d.style.cssText='width:'+size+'px;height:'+size+'px;left:'+(20+Math.random()*60)+'%;top:'+(20+Math.random()*60)+'%;animation-delay:'+(i*0.6)+'s;';
+    d.id='gdot'+i;
+    stage.appendChild(d);
+  });
+}
+
+function removeGlobeDots(){
+  [0,1,2].forEach(function(i){ var d=document.getElementById('gdot'+i); if(d) d.remove(); });
+}
+
+function greetEcho(){
+  if(!currentMoment) return;
+  if(navigator.vibrate) navigator.vibrate(30);
+  currentMoment.echoData.isEchoGreeted = true;
+  document.getElementById('echoGreetBtn').classList.add('greeted');
+  var clue1=document.getElementById('echoClue1');
+  clue1.textContent=currentMoment.echoData.clue_level_1;
+  setTimeout(function(){ clue1.classList.add('show'); }, 100);
+  if(!currentMomentIsNew) saveChronicle();
+}
+
+function archiveMoment(){
+  if(!currentMoment) return;
+  currentMoment.archived=true;
+  var chronicle=getChronicle();
+  chronicle.unshift(currentMoment);
+  try{ localStorage.setItem('tg_chronicle',JSON.stringify(chronicle)); } catch(e){}
+  updateChronicleCount();
+  document.getElementById('cardPaper').classList.add('fly-away');
+  setTimeout(function(){
+    closeCard();
+    var c=document.getElementById('c');
+    c.style.transition='filter 1.5s ease'; c.style.filter='none';
+    removeGlobeDots();
+  }, 700);
+}
+
+function closeCard(){
+  var card=document.getElementById('momentCard');
+  card.classList.remove('show');
+  setTimeout(function(){ card.style.display='none'; }, 600);
+  ['cs1','cs2','cs3','cs4'].forEach(function(id){ var el=document.getElementById(id); if(el) el.classList.remove('show'); });
+  var ec=document.getElementById('echoCard');
+  if(ec) ec.classList.remove('show','gold-flash');
+  var c=document.getElementById('c');
+  c.style.transition='filter 1.5s ease'; c.style.filter='none';
+  removeGlobeDots();
+}
+
+function getChronicle(){
+  try{ return JSON.parse(localStorage.getItem('tg_chronicle'))||[]; } catch(e){ return []; }
+}
+
+function saveChronicle(){
+  var chronicle=getChronicle();
+  var idx=chronicle.findIndex(function(m){ return m.uuid===currentMoment.uuid; });
+  if(idx>=0) chronicle[idx]=currentMoment;
+  try{ localStorage.setItem('tg_chronicle',JSON.stringify(chronicle)); } catch(e){}
+}
+
+function updateChronicleCount(){
+  var chronicle=getChronicle();
+  var btn=document.getElementById('chronicleBtn');
+  var count=document.getElementById('chronicleCount');
+  if(chronicle.length>0){ btn.classList.add('show'); count.textContent='⊚ '+chronicle.length; }
+  else { btn.classList.remove('show'); }
+}
+
+function openChronicle(){
+  var chronicle=getChronicle();
+  var list=document.getElementById('chronicleList');
+  list.innerHTML='';
+  if(chronicle.length===0){
+    list.innerHTML='<div class="chronicle-empty">年轮尚空<br>待刻入</div>';
+  } else {
+    chronicle.forEach(function(m){
+      var item=document.createElement('div');
+      item.className='chronicle-item';
+      item.innerHTML='<div class="chronicle-item-uuid">'+m.uuid+'</div>'
+        +'<div class="chronicle-item-text">'+(m.userText||'')+'</div>'
+        +'<div class="chronicle-item-loc">'+(m.location||'')+'</div>';
+      item.onclick=function(){
+        closeChronicle();
+        currentMoment=m; currentMomentIsNew=false;
+        setTimeout(function(){ showMomentCard(m); }, 400);
+      };
+      list.appendChild(item);
+    });
+  }
+  document.getElementById('chronicleDrawer').classList.add('open');
+  document.getElementById('chronicleOverlay').classList.add('open');
+}
+
+function closeChronicle(){
+  document.getElementById('chronicleDrawer').classList.remove('open');
+  document.getElementById('chronicleOverlay').classList.remove('open');
+}
+
+function copyBeacon(){
+  if(!currentMoment) return;
+  var text=currentMoment.echoData.clue_level_2;
+  if(navigator.clipboard){ navigator.clipboard.writeText(text).catch(function(){}); }
+  alert('信标已复制。接下来的故事，交还给现实世界。');
+}
+
+function showLeaveBook(){
+  document.getElementById('leaveBookArea').style.display='block';
+}
+
+function submitLeaveBook(){
+  var text=document.getElementById('leaveBookInput').value.trim();
+  if(!text||!currentMoment) return;
+  currentMoment.echoData.replyText=text;
+  saveChronicle();
+  document.getElementById('leaveBookInput').disabled=true;
+  document.getElementById('leaveBookBtn').textContent='纸飞机已飞向未来的那一端。';
+  document.getElementById('leaveBookBtn').disabled=true;
+  document.getElementById('leaveBookArea').style.display='none';
+}
+
+updateChronicleCount();
 
 
 
