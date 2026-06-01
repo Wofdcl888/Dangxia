@@ -1562,7 +1562,8 @@ const dot=document.getElementById('dot');
 const panel=document.getElementById('panel');
 let done=false;
 
-stage.addEventListener('click',()=>{
+stage.addEventListener('touchend',function(e){
+  e.preventDefault();
   if(done) return;
   done=true;
 
