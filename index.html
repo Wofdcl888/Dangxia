@@ -1434,6 +1434,7 @@ function updateChronicleCount(){
   var chronicle=getChronicle();
   var btn=document.getElementById('chronicleBtn');
   var count=document.getElementById('chronicleCount');
+  if(!btn||!count) return;
   if(chronicle.length>0){ btn.classList.add('show'); count.textContent='⊚ '+chronicle.length; }
   else { btn.classList.remove('show'); }
 }
@@ -1677,5 +1678,6 @@ stage.addEventListener('click', function(e){
   <div id="chronicleList"></div>
 </div>
 
+<script>document.addEventListener("DOMContentLoaded",function(){ updateChronicleCount(); });</script>
 </body>
 </html>
