@@ -199,7 +199,7 @@ header{
   font-size:16px;
   letter-spacing:2px;
   color:rgba(33,31,27,0.78);
-  line-height:1.6;
+  line-height:2.4;
   margin-bottom:4px;
 }
 .tagline-gap{
@@ -609,6 +609,16 @@ header{
   transform:translate(60px,-60px) scale(0.3);
   opacity:0;
 }
+.card-main-title{
+  font-family:'Noto Serif SC',serif;
+  font-weight:200;font-size:20px;
+  letter-spacing:8px;padding-left:8px;
+  color:rgba(33,31,27,0.82);
+  text-align:center;
+  margin-bottom:12px;
+  padding-bottom:12px;
+  border-bottom:0.5px solid rgba(33,31,27,0.1);
+}
 .card-uuid{
   font-family:'Cormorant Garamond',serif;
   font-size:9px;letter-spacing:1.5px;
@@ -803,11 +813,13 @@ header{
 /* Archive btn */
 .card-archive-btn{
   width:100%;margin-top:16px;
-  background:none;border:0.5px solid rgba(33,31,27,0.2);
-  padding:12px;cursor:pointer;
+  background:rgba(170,35,24,0.06);
+  border:1px solid rgba(170,35,24,0.35);
+  padding:14px;cursor:pointer;
   font-family:'Noto Serif SC',serif;
-  font-size:12px;letter-spacing:4px;
-  color:rgba(33,31,27,0.55);
+  font-size:13px;letter-spacing:4px;
+  color:rgba(170,35,24,0.85);
+  font-weight:400;
   transition:opacity 0.3s;
 }
 
@@ -1033,6 +1045,29 @@ function revealEl(id, delay){
   }, delay);
 }
 
+function getLocationPoem(zh){
+  // Generate a contextual line based on location keywords
+  var poems = [
+    {key:'佛罗里达', text:'海湾的风穿过棕榈叶，此刻的盐味是世界上独一无二的气息。'},
+    {key:'俄亥俄', text:'中西部的天空辽阔而低沉，麦田与公路在地平线处悄然相遇。'},
+    {key:'纽约', text:'八百万人同时呼吸，却没有一口气息与你的相同。'},
+    {key:'加州', text:'阳光落在太平洋的另一侧，每一道波浪都不会再来第二次。'},
+    {key:'北京', text:'胡同深处的时间流速不同，砖缝里藏着几百年的沉默。'},
+    {key:'上海', text:'霓虹与江水在夜里交融，这座城市从不停下来等任何人。'},
+    {key:'成都', text:'茶馆里的麻将声混入蝉鸣，慢下来是这里对时间的态度。'},
+    {key:'广州', text:'粤语的声调里藏着南方的湿气，早茶的香气飘过整条街道。'},
+    {key:'日本', text:'樱花落下的速度是每秒五厘米，而此刻你正在见证它的消失。'},
+    {key:'法国', text:'塞纳河的光永远比照片里的更温柔，此刻属于你一个人。'},
+    {key:'英国', text:'雨水打湿了石板路，伦敦的灰色里藏着一种独特的体面。'},
+    {key:'美国', text:'这片大陆足够宽广，宽广到每个人都可以在某处独自消失片刻。'},
+    {key:'中国', text:'五千年的回声在脚下震动，而此刻只有你一个人站在这里。'},
+  ];
+  for(var i=0;i<poems.length;i++){
+    if(zh && zh.indexOf(poems[i].key)>=0) return poems[i].text;
+  }
+  return '此地的空气里藏着你不知道的故事，而此刻，你正在写下自己的那一页。';
+}
+
 function revealLocation(zh, en, coords){
   var lzh=document.getElementById('p-loc-zh');
   var len=document.getElementById('p-loc-en');
@@ -1050,7 +1085,7 @@ function revealLocation(zh, en, coords){
   if(meta) setTimeout(()=>{ meta.style.opacity='1'; }, 720);
 
   // Body text: 4 lines flowing out, 500ms apart
-  setTimeout(revealTextLines, 1200);
+  setTimeout(function(){ revealTextLines(zh); }, 1200);
 }
 
 function revealTextLines(){
@@ -1100,7 +1135,13 @@ function doReveal(zh, en, coords){
       fetch('https://api.bigdatacloud.net/data/reverse-geocode-client?latitude='+la+'&longitude='+ln+'&localityLanguage=zh')
         .then(r=>r.json())
         .then(d=>{
-          const zh=[d.countryName,d.principalSubdivision,d.city||d.locality].filter(Boolean).join(' · ')||'未知的时空节点';
+          var parts=[d.countryName, d.principalSubdivision];
+          var city=d.city||d.locality||'';
+          // Only add city if it's not already contained in principalSubdivision
+          if(city && d.principalSubdivision && !d.principalSubdivision.includes(city) && city!==d.principalSubdivision){
+            parts.push(city);
+          }
+          const zh=parts.filter(Boolean).join(' · ')||'未知的时空节点';
           fetch('https://api.bigdatacloud.net/data/reverse-geocode-client?latitude='+la+'&longitude='+ln+'&localityLanguage=en')
             .then(r=>r.json())
             .then(d2=>{
@@ -1404,7 +1445,28 @@ function archiveMoment(){
     var c=document.getElementById('c');
     c.style.transition='filter 1.5s ease'; c.style.filter='none';
     removeGlobeDots();
+    // Show archive success toast
+    showArchiveToast();
   }, 700);
+}
+
+function showArchiveToast(){
+  var toast=document.createElement('div');
+  toast.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);'
+    +'z-index:9999;text-align:center;pointer-events:none;'
+    +'opacity:0;transition:opacity 0.6s ease;';
+  toast.innerHTML='<div style="font-family:'Noto Serif SC',serif;font-weight:200;'
+    +'font-size:18px;letter-spacing:5px;color:rgba(33,31,27,0.85);line-height:2.2;">'
+    +'已刻入</div>'
+    +'<div style="font-family:'Cormorant Garamond',serif;font-style:italic;'
+    +'font-size:13px;letter-spacing:2px;color:rgba(170,35,24,0.7);margin-top:6px;">'
+    +'漫漫时空，由我亲笔书写</div>';
+  document.body.appendChild(toast);
+  setTimeout(function(){ toast.style.opacity='1'; }, 30);
+  setTimeout(function(){
+    toast.style.opacity='0';
+    setTimeout(function(){ toast.remove(); }, 700);
+  }, 2500);
 }
 
 function closeCard(){
@@ -1623,6 +1685,7 @@ stage.addEventListener('click', function(e){
     <div class="card-flip-inner" id="cardFlipInner">
       <div class="card-front">
         <div class="card-paper" id="cardPaper">
+          <div class="card-main-title">时 空 存 证</div>
           <div class="card-uuid" id="cardUUID"></div>
           <div class="card-section" id="cs1">
             <div class="card-label">此刻感受</div>
