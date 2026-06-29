@@ -1452,15 +1452,15 @@ function archiveMoment(){
 
 function showArchiveToast(){
   var toast=document.createElement('div');
-  toast.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);'
-    +'z-index:9999;text-align:center;pointer-events:none;'
-    +'opacity:0;transition:opacity 0.6s ease;';
-  toast.innerHTML='<div style="font-family:'Noto Serif SC',serif;font-weight:200;'
-    +'font-size:18px;letter-spacing:5px;color:rgba(33,31,27,0.85);line-height:2.2;">'
-    +'已刻入</div>'
-    +'<div style="font-family:'Cormorant Garamond',serif;font-style:italic;'
-    +'font-size:13px;letter-spacing:2px;color:rgba(170,35,24,0.7);margin-top:6px;">'
-    +'漫漫时空，由我亲笔书写</div>';
+  toast.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:9999;text-align:center;pointer-events:none;opacity:0;transition:opacity 0.6s ease;';
+  var line1=document.createElement('div');
+  line1.style.cssText='font-family:serif;font-size:18px;letter-spacing:5px;color:rgba(33,31,27,0.85);line-height:2.2;';
+  line1.textContent='已 刻 入';
+  var line2=document.createElement('div');
+  line2.style.cssText='font-family:serif;font-style:italic;font-size:13px;letter-spacing:2px;color:rgba(170,35,24,0.7);margin-top:6px;';
+  line2.textContent='漫漫时空，由我亲笔书写';
+  toast.appendChild(line1);
+  toast.appendChild(line2);
   document.body.appendChild(toast);
   setTimeout(function(){ toast.style.opacity='1'; }, 30);
   setTimeout(function(){
