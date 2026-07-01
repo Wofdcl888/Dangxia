@@ -173,7 +173,8 @@ header{
 
 #cta{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:10;display:flex;flex-direction:column;align-items:center;pointer-events:none;transition:opacity 0.8s ease;}
 #cta.hidden{opacity:0;}
-.cta-click{font-family:'Noto Serif SC',serif;font-weight:400;font-size:22px;letter-spacing:8px;padding-left:8px;color:var(--red);line-height:1.2;text-shadow:0 0 8px #fff,0 0 20px #fff,0 0 35px rgba(255,255,255,0.9);animation:breathe 3.4s ease-in-out infinite;}
+.cta-click{
+  margin-bottom:8px;font-family:'Noto Serif SC',serif;font-weight:400;font-size:22px;letter-spacing:8px;padding-left:8px;color:var(--red);line-height:1.2;text-shadow:0 0 8px #fff,0 0 20px #fff,0 0 35px rgba(255,255,255,0.9);animation:breathe 3.4s ease-in-out infinite;}
 .cta-enter{font-family:'Noto Serif SC',serif;font-weight:400;font-size:18px;letter-spacing:7px;padding-left:7px;color:var(--red);line-height:1.3;text-shadow:0 0 8px #fff,0 0 20px #fff,0 0 35px rgba(255,255,255,0.9);animation:breathe 3.4s ease-in-out infinite;}
 @keyframes breathe{0%,100%{opacity:.5;}50%{opacity:1;}}
 
@@ -621,10 +622,16 @@ header{
 }
 .card-uuid{
   font-family:'Cormorant Garamond',serif;
-  font-size:9px;letter-spacing:1.5px;
-  color:rgba(33,31,27,0.35);
-  margin-bottom:16px;
+  font-size:11px;letter-spacing:1.5px;
+  color:rgba(33,31,27,0.5);
+  margin-bottom:4px;
   word-break:break-all;
+}
+.card-uuid-label{
+  font-family:'Noto Serif SC',serif;
+  font-size:9px;letter-spacing:2px;
+  color:rgba(33,31,27,0.3);
+  margin-bottom:12px;
 }
 .card-section{
   margin-bottom:12px;
@@ -644,16 +651,17 @@ header{
   line-height:1.7;
 }
 .card-freq{
-  font-family:'Cormorant Garamond',serif;
-  font-size:28px;font-weight:200;
-  color:var(--red);opacity:0.7;
-  letter-spacing:2px;
+  font-family:'Noto Serif SC',serif;
+  font-size:15px;font-weight:200;
+  color:var(--red);opacity:0.85;
+  letter-spacing:3px;
+  line-height:1.8;
 }
 .card-history{
   font-family:'Noto Serif SC',serif;
-  font-size:11px;font-weight:300;
-  color:rgba(33,31,27,0.38);
-  line-height:1.8;font-style:italic;
+  font-size:13px;font-weight:300;
+  color:rgba(33,31,27,0.5);
+  line-height:1.9;font-style:italic;
 }
 .card-rule{
   width:100%;height:0.5px;
@@ -699,6 +707,12 @@ header{
   font-size:12px;font-weight:300;
   color:rgba(33,31,27,0.72);
   line-height:1.8;margin-bottom:6px;
+}
+.echo-name{
+  font-family:'Noto Serif SC',serif;
+  font-size:12px;font-weight:300;
+  color:rgba(33,31,27,0.55);
+  margin-top:4px;letter-spacing:1px;
 }
 .echo-city{
   font-family:'Cormorant Garamond',serif;
@@ -995,7 +1009,7 @@ function draw(){
 
   // Update dot position to follow globe rotation
   if(dotActive) {
-    const targetLon=116.4, targetLat=39.9;
+    const targetLon=userLon, targetLat=userLat;
     const tileW=GR*2;
     const normX=((targetLon+180)/360)*tileW;
     const scroll=gOff%tileW;
@@ -1264,27 +1278,89 @@ function closeDrawer(){
   }
 }
 // ── PRESET DATA ──────────────────────────────────────────────────────
-var HISTORY_ECHOES = [
-  '1969年7月20日，人类第一次在月球上留下脚印。阿姆斯特朗说，这是个人的一小步。',
-  '1989年11月9日，柏林墙倒塌。分裂二十八年的城市，在一个夜晚重新相遇。',
-  '2003年2月1日，哥伦比亚号航天飞机解体于大气层。七名宇航员在返回地球的最后时刻消失。',
-  '1986年4月26日凌晨，切尔诺贝利核电站四号反应堆爆炸。那夜的天空，据说是蓝色的。',
-  '1945年8月6日8时15分，广岛上空的一道光。此后三年，影子被永久烙印在石阶上。',
-  '2011年3月11日，东日本大地震。海浪吞没了村庄，时钟停在了14:46。',
-  '1912年4月15日，泰坦尼克号沉没。最后一首曲子，据说是《与主更亲近》。',
-  '2020年1月，一种新型病毒开始在人群中流传。那时无人知晓，世界即将改变。',
+// History echoes indexed by [month, day]
+var HISTORY_BY_DATE = [
+  {m:1,d:1,text:'1863年1月1日，林肯签署《解放黑人奴隶宣言》。那一天，350万人在法律上获得了自由。'},
+  {m:1,d:17,text:'1995年1月17日，阪神大地震。凌晨5点46分，神户在18秒内失去了6434条生命。'},
+  {m:1,d:28,text:'1986年1月28日，挑战者号航天飞机升空73秒后解体。七名宇航员永远留在了高空。'},
+  {m:2,d:1,text:'2003年2月1日，哥伦比亚号航天飞机解体于大气层。七名宇航员在返回地球的最后时刻消失。'},
+  {m:2,d:14,text:'1929年2月14日，芝加哥情人节大屠杀。爱与死亡在同一天成为了历史。'},
+  {m:3,d:11,text:'2011年3月11日，东日本大地震。海浪吞没了村庄，时钟停在了14:46。'},
+  {m:3,d:26,text:'1827年3月26日，贝多芬在雷雨中离世。据说他最后向天空举起了拳头。'},
+  {m:4,d:4,text:'1968年4月4日，马丁·路德·金在孟菲斯遇刺。他前一天说，我已经看到了应许之地。'},
+  {m:4,d:15,text:'1912年4月15日，泰坦尼克号沉没。最后一首曲子，据说是《与主更亲近》。'},
+  {m:4,d:26,text:'1986年4月26日凌晨，切尔诺贝利核电站四号反应堆爆炸。那夜的天空，据说是蓝色的。'},
+  {m:5,d:8,text:'1945年5月8日，二战欧洲战场宣告结束。那天，整个欧洲在废墟上点燃了烟花。'},
+  {m:5,d:29,text:'1953年5月29日，人类第一次站在珠穆朗玛峰顶。希拉里说，我们征服了它。丹增说，它允许我们上去。'},
+  {m:6,d:4,text:'1989年6月4日，一个普通的夏夜，历史在广场上转了一个弯。'},
+  {m:6,d:6,text:'1944年6月6日，盟军在诺曼底登陆。那一天，15万人踏上了改变世界的海滩。'},
+  {m:6,d:28,text:'1914年6月28日，萨拉热窝的一声枪响，终结了旧世界，开启了一个充满战争的世纪。'},
+  {m:7,d:4,text:'1776年7月4日，一份宣言宣告了一个新国家的诞生。那天的费城，蝉声很响。'},
+  {m:7,d:20,text:'1969年7月20日，人类第一次在月球上留下脚印。阿姆斯特朗说，这是个人的一小步。'},
+  {m:8,d:6,text:'1945年8月6日8时15分，广岛上空的一道光。此后三年，影子被永久烙印在石阶上。'},
+  {m:8,d:9,text:'1945年8月9日，长崎。第二颗原子弹落下，战争终于在灰烬中走向了终结。'},
+  {m:9,d:1,text:'1939年9月1日，德军越过波兰边境。那天早晨，世界上最后一段和平时光结束了。'},
+  {m:9,d:11,text:'2001年9月11日，两座塔在晨光中消失。那之后，世界变得不再一样。'},
+  {m:10,d:3,text:'1990年10月3日，德国重新统一。分裂了45年的国家，在一个秋天的早晨重新成为一个整体。'},
+  {m:10,d:14,text:'1066年10月14日，黑斯廷斯战役。英格兰的命运在那个下午彻底改变了方向。'},
+  {m:11,d:9,text:'1989年11月9日，柏林墙倒塌。分裂二十八年的城市，在一个夜晚重新相遇。'},
+  {m:11,d:22,text:'1963年11月22日，达拉斯的阳光里，一位总统倒下了。美国从此失去了某种天真。'},
+  {m:12,d:7,text:'1941年12月7日，珍珠港。那个周日的早晨，太平洋战争就此开始。'},
+  {m:12,d:25,text:'1991年12月25日，苏联国旗从克里姆林宫降落。一个帝国在平安夜悄然落幕。'},
 ];
 
-var ECHO_LIBRARY = [
-  {text:'今天的咖啡喝完了，窗外还在下雨。不知道为什么，我一直在等一条不会来的消息。',location:'上海',clue_level_1:'窗外有雨声，房间里有某首法语歌在循环。',clue_level_2:'@muted_tide · Telegram'},
-  {text:'刚刚在便利店看到一对老夫妻，他帮她系围巾。我站在冷饮柜前站了很久。',location:'京都',clue_level_1:'背景音是寺院的钟声，空气里有柴火的气味。',clue_level_2:'thread: still_here_2047 · Mastodon'},
-  {text:'我妈今天问我什么时候找对象，我说我在等一个懂得沉默的人。她说我太难了。',location:'成都',clue_level_1:'四川话的方言声，麻辣烫店的蒸汽。',clue_level_2:'douban：慢递信箱No.7'},
-  {text:'三十岁的生日，一个人吃了一碗泡面。泡面很好吃，我哭了一下，又觉得还好。',location:'北京',clue_level_1:'远处有施工的声音，是深夜的北三环。',clue_level_2:'即刻：not_yet_ready'},
-  {text:'失业第47天，今天出门走了三公里，看到一只猫坐在废弃商铺的台阶上晒太阳。',location:'深圳',clue_level_1:'粤语广播，远处地铁的轰鸣声。',clue_level_2:'Signal: +ghost_frequency'},
-  {text:'和他分手的第200天，我终于可以听那首歌了。只是哭的原因，已经不一样了。',location:'香港',clue_level_1:'维港的船鸣，还有某个屋顶的风声。',clue_level_2:'小红书：消失的海浪'},
-  {text:'今晚我把房间里最后一盆植物送给了邻居。我要离开这座城市了，去哪里还不知道。',location:'广州',clue_level_1:'热带夜晚的蝉鸣，远处的鞭炮声。',clue_level_2:'Twitter/X: @softnoise_'},
-  {text:'凌晨两点，我一个人在医院走廊等消息。自动贩卖机的灯是整条走廊最亮的东西。',location:'武汉',clue_level_1:'消毒水的气味，病历车轮子的声音。',clue_level_2:'豆瓣小组：深夜候诊室'},
-];
+function getHistoryEcho(){
+  var now=new Date();
+  var m=now.getMonth()+1, d=now.getDate();
+  // Find exact match
+  for(var i=0;i<HISTORY_BY_DATE.length;i++){
+    if(HISTORY_BY_DATE[i].m===m && HISTORY_BY_DATE[i].d===d) return HISTORY_BY_DATE[i].text;
+  }
+  // Find same month
+  var sameMonth=HISTORY_BY_DATE.filter(function(h){ return h.m===m; });
+  if(sameMonth.length>0) return sameMonth[Math.floor(Math.random()*sameMonth.length)].text;
+  // Random fallback
+  return HISTORY_BY_DATE[Math.floor(Math.random()*HISTORY_BY_DATE.length)].text;
+}
+
+var ECHO_LIBRARY = {
+  cn: [
+    {name:'林晓声',text:'今天的咖啡喝完了，窗外还在下雨。不知道为什么，我一直在等一条不会来的消息。',location:'上海',clue_level_1:'窗外有雨声，房间里有某首法语歌在循环。',clue_level_2:'@muted_tide · Telegram'},
+    {name:'沈以歌',text:'刚刚在便利店看到一对老夫妻，他帮她系围巾。我站在冷饮柜前站了很久。',location:'北京',clue_level_1:'背景音是胡同里的鸽哨，空气里有煤球的气味。',clue_level_2:'即刻：still_here_2047'},
+    {name:'余木白',text:'我妈今天问我什么时候找对象，我说我在等一个懂得沉默的人。她说我太难了。',location:'成都',clue_level_1:'四川话的方言声，麻辣烫店的蒸汽。',clue_level_2:'douban：慢递信箱No.7'},
+    {name:'江未眠',text:'三十岁的生日，一个人吃了一碗泡面。泡面很好吃，我哭了一下，又觉得还好。',location:'深圳',clue_level_1:'窗外是深夜的城中村，有人在楼道唱歌。',clue_level_2:'微博：not_yet_ready'},
+    {name:'顾离川',text:'失业第47天，今天出门走了三公里，看到一只猫坐在废弃商铺的台阶上晒太阳。',location:'杭州',clue_level_1:'西湖边的柳絮飘进了口罩，春天来了又怎样。',clue_level_2:'Signal: ghost_frequency'},
+    {name:'谢无声',text:'和他分手的第200天，我终于可以听那首歌了。只是哭的原因，已经不一样了。',location:'香港',clue_level_1:'维港的船鸣，还有某个屋顶的风声。',clue_level_2:'小红书：消失的海浪'},
+    {name:'白鹿鸣',text:'今晚我把房间里最后一盆植物送给了邻居。我要离开这座城市了，去哪里还不知道。',location:'广州',clue_level_1:'热带夜晚的蝉鸣，远处的鞭炮声。',clue_level_2:'Twitter/X: @softnoise_'},
+    {name:'陆时渡',text:'凌晨两点，我一个人在医院走廊等消息。自动贩卖机的灯是整条走廊最亮的东西。',location:'武汉',clue_level_1:'消毒水的气味，病历车轮子的声音。',clue_level_2:'豆瓣小组：深夜候诊室'},
+  ],
+  en: [
+    {name:'Maya K.',text:'Been sitting in this café for three hours. Ordered two coffees. Still not sure what I'm waiting for.',location:'New York',clue_level_1:'Rain on the window, someone playing Satie on the piano across the room.',clue_level_2:'@quiet.frequency · Instagram'},
+    {name:'Leo H.',text:'Saw an old couple at the grocery store today. He was reading labels out loud to her. I stood there for too long.',location:'Chicago',clue_level_1:'Lake wind, the smell of November coming in through someone's open door.',clue_level_2:'thread: softnoise · Mastodon'},
+    {name:'Sara M.',text:'Turned 30 yesterday. Ate cake alone. Cried a little. Then felt okay about it.',location:'Los Angeles',clue_level_1:'Traffic on the 101, neighbor's dog barking at nothing.',clue_level_2:'notes app: still_here'},
+    {name:'Jin P.',text:'Day 47 of not knowing what comes next. Walked to the park. A cat was sleeping on a bench. I envied it.',location:'San Francisco',clue_level_1:'Fog coming in from the bay, distant foghorn.',clue_level_2:'Signal: +ghost.wav'},
+    {name:'Elle T.',text:'200 days since the breakup. Finally listened to that song again. The crying feels different now.',location:'Seattle',clue_level_1:'Rain, obviously. Always rain. The kind that sounds like thinking.',clue_level_2:'@muted.tide · Twitter'},
+    {name:'Owen L.',text:'Gave my last plant to the neighbor downstairs. Leaving this city tomorrow. Don't know where yet.',location:'Austin',clue_level_1:'Cicadas, someone two floors up playing guitar badly.',clue_level_2:'Reddit: u/softnoise_'},
+    {name:'Nora V.',text:'2am in the hospital hallway waiting for news. The vending machine was the brightest thing in the corridor.',location:'Boston',clue_level_1:'Squeaking wheels, the smell of antiseptic, a TV showing news no one was watching.',clue_level_2:'Discord: ghost_frequency#0047'},
+  ]
+};
+
+function getEchoByRegion(locationZh){
+  // Determine region based on location
+  var isChinese = locationZh && (
+    locationZh.indexOf('中国') >= 0 ||
+    locationZh.indexOf('北京') >= 0 ||
+    locationZh.indexOf('上海') >= 0 ||
+    locationZh.indexOf('广州') >= 0 ||
+    locationZh.indexOf('深圳') >= 0 ||
+    locationZh.indexOf('成都') >= 0 ||
+    locationZh.indexOf('Hong Kong') >= 0 ||
+    locationZh.indexOf('香港') >= 0 ||
+    locationZh.indexOf('台') >= 0
+  );
+  var pool = isChinese ? ECHO_LIBRARY.cn : ECHO_LIBRARY.en;
+  return pool[Math.floor(Math.random()*pool.length)];
+}
 
 function generateUUID(){
   var now=new Date();
@@ -1306,8 +1382,8 @@ function drawerSave(){
   var locZh = document.getElementById('p-loc-zh');
   var coords = coordEl ? coordEl.textContent : '未知坐标';
   var location = locZh ? locZh.textContent : '未知的时空节点';
-  var echo = ECHO_LIBRARY[Math.floor(Math.random()*ECHO_LIBRARY.length)];
-  var history = HISTORY_ECHOES[Math.floor(Math.random()*HISTORY_ECHOES.length)];
+  var echo = getEchoByRegion(location);
+  var history = getHistoryEcho();
   currentMoment = {
     uuid: generateUUID(),
     timestamp: now.getTime(),
@@ -1317,6 +1393,7 @@ function drawerSave(){
     frequencyIndex: Math.floor(Math.random()*451)+50,
     historyEcho: history,
     echoData: {
+      name: echo.name||'',
       text: echo.text,
       location: echo.location,
       clue_level_1: echo.clue_level_1,
@@ -1343,13 +1420,14 @@ function showMomentCard(moment){
   document.getElementById('cardUUID').textContent = m.uuid;
   document.getElementById('cardText').textContent = m.userText;
   document.getElementById('cardCoords').textContent = (m.location||'') + ' · ' + m.coordinates;
-  document.getElementById('cardFreq').textContent = m.frequencyIndex + ' Hz';
+  document.getElementById('cardFreq').textContent = '与 ' + m.frequencyIndex + ' 人 共 振 此 刻';
   document.getElementById('cardHistory').textContent = m.historyEcho;
   document.getElementById('cardBackId').textContent = m.echoData.clue_level_2;
   document.getElementById('leaveBookArea').style.display='none';
   var echoCard = document.getElementById('echoCard');
   document.getElementById('echoText').textContent = m.echoData.text;
   document.getElementById('echoCity').textContent = '· ' + m.echoData.location + ' ·';
+  var echoNameEl=document.getElementById('echoName'); if(echoNameEl) echoNameEl.textContent = m.echoData.name||'';
   var greetBtn = document.getElementById('echoGreetBtn');
   var clue1 = document.getElementById('echoClue1');
   var clue2 = document.getElementById('echoClue2');
@@ -1686,7 +1764,7 @@ stage.addEventListener('click', function(e){
       <div class="card-front">
         <div class="card-paper" id="cardPaper">
           <div class="card-main-title">时 空 存 证</div>
-          <div class="card-uuid" id="cardUUID"></div>
+          <div class="card-uuid-label">存 证 编 号</div><div class="card-uuid" id="cardUUID"></div>
           <div class="card-section" id="cs1">
             <div class="card-label">此刻感受</div>
             <div class="card-value" id="cardText"></div>
@@ -1697,7 +1775,7 @@ stage.addEventListener('click', function(e){
             <div class="card-value" id="cardCoords"></div>
           </div>
           <div class="card-section" id="cs3">
-            <div class="card-label">同频指数</div>
+            <div class="card-label">此刻共振</div>
             <div class="card-freq" id="cardFreq"></div>
           </div>
           <div class="card-section" id="cs4">
@@ -1707,6 +1785,7 @@ stage.addEventListener('click', function(e){
             <div class="card-label">来自时间另一端</div>
             <div class="echo-text" id="echoText"></div>
             <div class="echo-city" id="echoCity"></div>
+            <div class="echo-name" id="echoName"></div>
             <div class="echo-clue" id="echoClue1"></div>
             <div class="echo-clue" id="echoClue2" style="color:rgba(180,140,60,0.75);font-style:normal;letter-spacing:1px;"></div>
             <button class="echo-greet-btn" id="echoGreetBtn" onclick="greetEcho()">〜</button>
